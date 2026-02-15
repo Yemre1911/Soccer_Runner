@@ -11932,6 +11932,7 @@ GameObject:
   - component: {fileID: 1781460023}
   - component: {fileID: 1781460025}
   - component: {fileID: 1781460024}
+  - component: {fileID: 1781460026}
   m_Layer: 0
   m_Name: Player_Root
   m_TagString: Untagged
@@ -11982,6 +11983,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a06a930e33475949bb49507978b7646, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
+--- !u!114 &1781460026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1781460022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8b85727d495d7c468e12e32648a0c5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerVerticalMovement
+  jumpHeight: 10
+  timeToJumpApex: 0.5
+  quickDropFactor: 3
 --- !u!1 &1790749930
 GameObject:
   m_ObjectHideFlags: 0

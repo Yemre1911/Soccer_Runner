@@ -5,14 +5,13 @@ using UnityEngine;
 public class BallController : MonoBehaviour
 {
     [Header("Setup")]
-    public Transform PlayerSocket; // Karakterin önündeki boş obje (Sürükle-Bırak)
+    public Transform PlayerSocket;
 
     private IBallState _currentState;
 
     private void Start()
     {
         SetupPhysics();
-        // Oyuna "Dribble" (Sürme) moduyla başla
         ChangeState(new DribbleState());
     }
 
@@ -21,7 +20,6 @@ public class BallController : MonoBehaviour
         _currentState?.OnUpdate(this, Time.deltaTime);
     }
 
-    // Gelecekte Şut veya Pas eklendiğinde burayı kullanacağız
     public void ChangeState(IBallState newState)
     {
         _currentState?.OnExit(this);
@@ -29,28 +27,31 @@ public class BallController : MonoBehaviour
         _currentState?.OnEnter(this);
     }
 
-    // Performans için Fizik Ayarları
+    // --- PLAYER TARAFINDAN ÇAĞRILACAK METOTLAR ---
+    
+    public void OnPlayerJump()
+    {
+        // Eğer zaten havadaysak tekrar zıplama (Double jump yoksa)
+        if (!(_currentState is BallJumpState))
+        {
+            ChangeState(new BallJumpState());
+        }
+    }
+
+    public void OnPlayerQuickDrop()
+    {
+        // Eğer havadaysak state'e haber ver
+        if (_currentState is BallJumpState jumpState)
+        {
+            jumpState.SetQuickDrop();
+        }
+    }
+
     private void SetupPhysics()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true; // Fiziği kapattık, kodla yönetiyoruz
+        rb.isKinematic = true; 
         rb.useGravity = false;
-        
-        SphereCollider col = GetComponent<SphereCollider>();
-        col.isTrigger = true; // Çarpışmaları sadece "Bilgi" olarak alacağız
+        GetComponent<SphereCollider>().isTrigger = true; 
     }
-
-    // Çarpışma Mantığı (İlerisi için hazırlık)
-   /* private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Enemy"))
-        {
-            Debug.Log("Rakip topa değdi!");
-            // İleride buraya: ChangeState(new LostBallState());
-        }
-        else if (other.CompareTag("OutOfBounds"))
-        {
-            Debug.Log("Top dışarı çıktı!");
-        }
-    }*/
 }
