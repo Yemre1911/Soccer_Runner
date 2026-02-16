@@ -6,8 +6,8 @@ public class PlayerVerticalMovement : MonoBehaviour, IJumper
     public BallController Ball;
 
     [Header("Zıplama Ayarları")]
-     private float jumpHeight = 4f; // Biraz artırdım daha net görülsün
-     private float timeToJumpApex = 0.2f; 
+     private float jumpHeight = 5f; // Biraz artırdım daha net görülsün
+     private float timeToJumpApex = 0.3f; 
      private float quickDropFactor = 4f; // Hızlı iniş daha keskin olsun
 
     public float JumpHeight => jumpHeight;

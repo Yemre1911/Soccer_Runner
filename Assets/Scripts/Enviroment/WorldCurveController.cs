@@ -6,8 +6,8 @@ public class WorldCurveController : MonoBehaviour
     [SerializeField] private Transform _playerTransform;
 
     [Header("Curve Ayarları")]
-    private float _maxCurveAmount = 0.0021f;
-    [SerializeField] private float _maxPlayerX = 4f;
+    public float _maxCurveAmount = 0.0005f;
+    [SerializeField] private float _maxPlayerX = 3f;
 
     // Shader Graph'taki referansın ID karşılığı
     private int _curvePropertyID;

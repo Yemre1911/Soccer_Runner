@@ -4,7 +4,7 @@ public class PlayerLateralMovement : MonoBehaviour, IMover
 {
     [Header("Adım Ayarları")]
     [SerializeField] private float stepSize = 5f;
-    [SerializeField] private float roadWidth = 15f;
+    [SerializeField] private float roadWidth = 10f;
 
     [Header("Hız Ayarları (Upgrade İçin)")]
     // Upgrade sistemi burayı değiştirecek (Örn: 0.2 -> 0.1 -> 0.05)
