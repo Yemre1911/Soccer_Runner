@@ -5,11 +5,12 @@ public class PlayerInput : MonoBehaviour
 {
     private IMover _mover;
     private IJumper _jumper;
-
+    private ISprinter _sprinter;
     private void Awake()
     {
         _mover = GetComponent<IMover>();
         _jumper = GetComponent<IJumper>();
+        _sprinter = GetComponent<ISprinter>(); // Sprint scriptini al
 
         // KONTROL 1: Scriptleri bulabildi mi?
         if (_mover == null) Debug.LogError("HATA: PlayerLateralMovement scripti bu objede yok!");
@@ -17,22 +18,20 @@ public class PlayerInput : MonoBehaviour
 
         if (_jumper == null) Debug.LogError("HATA: PlayerVerticalMovement scripti bu objede yok!");
         else Debug.Log("BAŞARILI: Zıplama scripti bulundu.");
+
+        if (_sprinter == null) Debug.LogError("ISprinter bulunamadı!");
     }
     private void Update()
     {
         if (Keyboard.current == null) return;
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            Debug.Log("TUŞ: Space tuşuna basıldı!"); // Tuşu algılıyor mu?
-            
             if (_jumper != null)
-            {
                 _jumper.Jump();
-                Debug.Log("EYLEM: Zıplama komutu gönderildi.");
-            }
         }
         HandleLateralInput();
         HandleVerticalInput();
+        HandleSprintInput();
     }
 
     private void HandleLateralInput()
@@ -42,7 +41,7 @@ public class PlayerInput : MonoBehaviour
         {
             _mover.MoveStep(-1);
         }
-        
+
         // Sağa Basma
         if (Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame)
         {
@@ -64,7 +63,24 @@ public class PlayerInput : MonoBehaviour
             _jumper.QuickDrop();
         }
     }
+
+    private void HandleSprintInput()
+    {
+        if (_sprinter == null) return;
+
+        // Gelecek için not: Mobilde burası "IsTouchingScreen" gibi bir bool olacak.
+        bool isSprintKeyPressed = Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed;
+
+        if (isSprintKeyPressed)
+        {
+            _sprinter.StartSprint();
+        }
+        else
+        {
+            _sprinter.StopSprint();
+        }
+    }
 }
 
 
-    
+

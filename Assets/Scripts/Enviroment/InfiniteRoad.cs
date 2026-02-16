@@ -30,13 +30,3 @@ public class InfiniteRoad : MonoBehaviour
         }
     }
 }
-
-
-
-/*
-kaldığımız yerden devam edelim. Şuan şöyle bir sorun yaşıyorum: İnfiniteRoad mantığı ile spawn edilen ve sorunsuz çalışan yollarım var. Tek sıkınıt, kamerada bazen bu yolların bazı kısımları (farklı object'ler) yok olup tekrar görünür oluyor, bir hata şeklinde.
-
-kameranın field of view ayarını arttırınca bu sorun minimuma iniyor ancak benim fov değerim (60) değişmemeli, 60 değeri benim için ideal.
-
-Bu yok olmalar genelde kameranın yakınlarındaki random objelerde oluyor. Bunu nasıl çözeriz, sebebi nedir?
-*/

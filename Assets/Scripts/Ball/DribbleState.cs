@@ -2,116 +2,92 @@ using UnityEngine;
 
 public class DribbleState : IBallState
 {
-    private Vector3 _velocity; // SmoothDamp referansı
-    private PlayerLateralMovement _playerScript;
+    private Vector3 _velocity;
+    private PlayerLateralMovement _playerMovement;
+    private ISprinter _playerSprinter;
 
     // --- AYARLAR ---
-    [Header("Yükseklik & Kavis")]
-    private float _baseHeight = -0.55f; // Topun yerdeki yüksekliği
-    private float _arcHeight = 0.35f;  // İleri giderken ne kadar yükselsin?
+    private float _baseHeight = -0.55f;
+    private float _arcHeight = 0.35f;
 
-    [Header("Dribble Ritmi")]
-    private float _dribbleFrequency = 10f; // Ayak hızı
-    private float _dribbleAmplitude = 2f; // Top ne kadar öne açılsın
+    // Normal vs Sprint Değerleri
+    private float _normalFreq = 10f;
+    private float _sprintFreq = 5f; // Sprintte ayaklar daha hızlı
+    private float _normalAmp = 2f;
+    private float _sprintAmp = 4f; // Sprintte top daha ileri açılır
 
-    [Header("Akışkanlık (Game Feel)")]
-    private float _lateralSmoothTime = 0.05f; // Yanlara kayma yumuşaklığı (Şşlaaapks hissi)
-    private float _returnToFootSpeed = 20f;   // Yana kaçarken topu geri çekme hızı
+    // Dinamik Değişkenler
+    private float _currentAmp;
+    private float _currentFreq;
+    private float _sinePhase = 0f; // TİTREMEYİ ÖNLEYEN DEĞİŞKEN
 
     public void OnEnter(BallController ball)
     {
         if (ball.PlayerSocket != null)
         {
-            _playerScript = ball.PlayerSocket.GetComponentInParent<PlayerLateralMovement>();
+            _playerMovement = ball.PlayerSocket.GetComponentInParent<PlayerLateralMovement>();
+            _playerSprinter = ball.PlayerSocket.GetComponentInParent<ISprinter>();
         }
+
+        _currentAmp = _normalAmp;
+        _currentFreq = _normalFreq;
     }
 
     public void OnUpdate(BallController ball, float deltaTime)
     {
-        if (ball.PlayerSocket == null || _playerScript == null) return;
+        if (ball.PlayerSocket == null || _playerMovement == null) return;
 
-        // 1. DURUM ANALİZİ: Şuan yana mı gidiyoruz, düz mü?
-        // Topun şu anki X'i ile Hedef X arasındaki farka bak.
-        float xDifference = Mathf.Abs(ball.transform.position.x - _playerScript.TargetX);
-        
-        // Eğer fark 0.1f'den büyükse, karakter şerit değiştiriyordur.
+        bool isSprinting = (_playerSprinter != null) && _playerSprinter.IsSprinting;
+
+        // 1. Değerleri Hedefe Yumuşakça Götür (Lerp)
+        float targetAmp = isSprinting ? _sprintAmp : _normalAmp;
+        float targetFreq = isSprinting ? _sprintFreq : _normalFreq;
+
+        _currentAmp = Mathf.Lerp(_currentAmp, targetAmp, deltaTime * 3f);
+        _currentFreq = Mathf.Lerp(_currentFreq, targetFreq, deltaTime * 3f);
+
+        // 2. TİTREMESİZ SİNÜS HESABI
+        // Time.time yerine kendi fazımızı biriktiriyoruz.
+        _sinePhase += deltaTime * _currentFreq;
+        // Sayı çok büyümesin diye mod alıyoruz (İsteğe bağlı ama sonsuz koşu için iyi)
+        if (_sinePhase > Mathf.PI * 2) _sinePhase -= Mathf.PI * 2;
+
+        float cycle = (Mathf.Sin(_sinePhase) + 1f) * 0.5f;
+
+
+        // 3. POZİSYON HESAPLAMA
+        float xDifference = Mathf.Abs(ball.transform.position.x - _playerMovement.TargetX);
         bool isChangingLane = xDifference > 0.1f;
 
-        // ---------------------------------------------------------
-
-        // 2. Z EKSENİ (İleri/Geri ve Geri Çekme)
         float targetZ;
-        float cycle = 0f;
-
         if (isChangingLane)
         {
-            // KURAL 2: Sağa/Sola gidiyorsak, topu hemen ayağa (Socket'e) çek!
-            // Amplitude'u 0 gibi düşünüyoruz.
             targetZ = ball.PlayerSocket.position.z;
-            
-            // Cycle 0 olsun ki top yere insin (Kavis yapmasın)
-            cycle = 0f; 
+            cycle = 0f; // Yana geçerken top yerde kalsın
         }
         else
         {
-            // Düz gidiyorsak ritmik sürmeye devam et
-            // (Sin + 1) * 0.5 formülü bize 0 ile 1 arası yumuşak bir değer verir.
-            cycle = (Mathf.Sin(Time.time * _dribbleFrequency) + 1f) * 0.5f;
-            targetZ = ball.PlayerSocket.position.z + (cycle * _dribbleAmplitude);
+            targetZ = ball.PlayerSocket.position.z + (cycle * _currentAmp);
         }
 
-        // ---------------------------------------------------------
-
-        // 3. Y EKSENİ (Kavisli Yükseliş - KURAL 1)
-        // Cycle 0 ise (ayakta) yükseklik _baseHeight.
-        // Cycle 1 ise (en uçta) yükseklik _baseHeight + _arcHeight.
-        // Bu basit toplama işlemi, top ileri gittikçe yükselmesini sağlar.
         float targetY = _baseHeight + (cycle * _arcHeight);
+        float targetX = _playerMovement.TargetX;
 
-        // ---------------------------------------------------------
-
-        // 4. X EKSENİ (Yanal Hareket - KURAL 3)
-        // Karakterin hedefi neresiyse oraya git.
-        float targetX = _playerScript.TargetX;
-
-        // 5. HAREKETİ UYGULA (SmoothDamp ile Şşlaaapks Hissi)
-        
-        // Yanlara giderken kullanacağımız SmoothTime ayarı.
-        // Eğer şerit değiştiriyorsak biraz daha yumuşak (_lateralSmoothTime),
-        // Düz gidiyorsak karakterin hızına bağlı (daha snappy).
-        float currentSmoothTime = isChangingLane ? _lateralSmoothTime : 0.05f;
-
+        // 4. HAREKETİ UYGULA
         Vector3 targetPosition = new Vector3(targetX, targetY, targetZ);
 
-        // Z ekseni için özel bir durum: Yana geçerken Z'yi çok hızlı geri çekmeliyiz.
-        // Bu yüzden SmoothDamp'ın "MaxSpeed" parametresini duruma göre değiştiriyoruz.
-        float maxSpeed = isChangingLane ? _returnToFootSpeed * 2f : 50f;
+        // Sprintte top biraz daha sert/hızlı tepki versin
+        float smoothTime = isChangingLane ? 0.05f : (isSprinting ? 0.03f : 0.05f);
+        float maxSpeed = isChangingLane ? 40f : (isSprinting ? 60f : 50f);
 
         ball.transform.position = Vector3.SmoothDamp(
-            ball.transform.position,
-            targetPosition,
-            ref _velocity,
-            currentSmoothTime,
-            maxSpeed,
-            deltaTime
+            ball.transform.position, targetPosition, ref _velocity, smoothTime, maxSpeed, deltaTime
         );
 
-        // ---------------------------------------------------------
-
-        // 6. GÖRSEL DÖNME (ROTATION)
-        RotateBall(ball.transform, deltaTime, _velocity);
+        // 5. GÖRSEL DÖNME
+        ball.transform.Rotate(Vector3.right * (isSprinting ? 1200f : 800f) * deltaTime, Space.World);
+        ball.transform.Rotate(Vector3.forward * -_velocity.x * 3f * deltaTime, Space.World);
     }
 
-    private void RotateBall(Transform t, float dt, Vector3 velocity)
-    {
-        // İleri doğru yuvarlanma (Hıza bağlı)
-        float runSpeed = 800f * dt; 
-        t.Rotate(Vector3.right * runSpeed, Space.World);
-
-        // Sağa sola yatma (Banking) - Dönüş hissiyatını artırır
-        float tilt = velocity.x * 3f; 
-        t.Rotate(Vector3.forward * -tilt * dt, Space.World);
-    }
-    
     public void OnExit(BallController ball) { }
 }
