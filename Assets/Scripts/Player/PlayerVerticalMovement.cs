@@ -1,19 +1,19 @@
 using UnityEngine;
-
+using System;
 public class PlayerVerticalMovement : MonoBehaviour, IJumper
 {
     [Header("Referanslar")]
     public BallController Ball;
 
     [Header("Zıplama Ayarları")]
-     private float jumpHeight = 5f; // Biraz artırdım daha net görülsün
-     private float timeToJumpApex = 0.3f; 
-     private float quickDropFactor = 4f; // Hızlı iniş daha keskin olsun
+    private float jumpHeight = 5f; // Biraz artırdım daha net görülsün
+    private float timeToJumpApex = 0.3f;
+    private float quickDropFactor = 4f; // Hızlı iniş daha keskin olsun
 
     public float JumpHeight => jumpHeight;
     public float TimeToJumpApex => timeToJumpApex;
 
-    
+
     private float _gravity;
     private float _jumpVelocity;
     private float _verticalVelocity;
@@ -21,6 +21,14 @@ public class PlayerVerticalMovement : MonoBehaviour, IJumper
     private bool _isQuickDropping;
 
     private const float GroundLevel = 0f; // Zemin Yüksekliği
+
+
+    // EVENTLER: Animasyon kontrolcüsü buralara abone olacak
+    public event Action OnJumpPerformed;
+    public event Action OnQuickDropPerformed;
+    public event Action<bool> OnGroundedStatusChanged;
+
+    private bool _lastGroundedStatus; // Durum değişimini takip etmek için
 
     private void Awake()
     {
@@ -33,6 +41,7 @@ public class PlayerVerticalMovement : MonoBehaviour, IJumper
     {
         HandleGravity();
         ApplyMovement();
+        CheckGroundedChange(); 
     }
 
     private void HandleGravity()
@@ -44,13 +53,13 @@ public class PlayerVerticalMovement : MonoBehaviour, IJumper
         {
             _verticalVelocity = -0.5f; // Yere sabitlemek için ufak kuvvet
             _isGrounded = true;
-            _isQuickDropping = false; 
+            _isQuickDropping = false;
 
             // Pozisyonu tam sıfıra çek (titremeyi önler)
             Vector3 fixPos = transform.position;
             fixPos.y = GroundLevel;
             transform.position = fixPos;
-            
+
             return;
         }
 
@@ -71,15 +80,25 @@ public class PlayerVerticalMovement : MonoBehaviour, IJumper
         transform.position = pos;
     }
 
+    private void CheckGroundedChange()
+    {
+        // Gereksiz event fırlatmamak için sadece durum değiştiğinde haber ver
+        if (_isGrounded != _lastGroundedStatus)
+        {
+            _lastGroundedStatus = _isGrounded;
+            OnGroundedStatusChanged?.Invoke(_isGrounded);
+        }
+    }
+
     public void Jump()
     {
         // Sadece yerdeyken zıpla
         if (_isGrounded)
         {
             _verticalVelocity = _jumpVelocity; // Hızı yukarı veriyoruz
-            // Not: _isGrounded burada false yapmıyoruz, bir sonraki frame HandleGravity halledecek.
-
             if (Ball != null) Ball.OnPlayerJump();
+
+            OnJumpPerformed?.Invoke();
         }
     }
 
@@ -91,7 +110,9 @@ public class PlayerVerticalMovement : MonoBehaviour, IJumper
             // Eğer hala yükseliyorsan, yükselmeyi iptal et ve düşüşe geç
             if (_verticalVelocity > 0) _verticalVelocity = 0;
 
-            if (Ball != null) Ball.OnPlayerQuickDrop(); 
+            if (Ball != null) Ball.OnPlayerQuickDrop();
+
+            OnQuickDropPerformed?.Invoke();
         }
     }
 }
