@@ -7,9 +7,14 @@ public class PlayerAnimationController : MonoBehaviour
     [SerializeField] private PlayerVerticalMovement verticalMovement;
     [SerializeField] private PlayerSprint playerSprint;
 
+    [Header("Combat / Game")]
+    [SerializeField] private PlayerCombatState combatState;   // eklendi
+    [SerializeField] private HitResolver hitResolver;         // eklendi (topa değip gameover olursa)
+
+
     [Header("Hız Kalibrasyonu")]
     [Tooltip("Dünya hızını buna böleriz (Senin bulduğun 10 değeri)")]
-    [SerializeField] private float speedDivisor = 10f; 
+    [SerializeField] private float speedDivisor = 10f;
 
     [Tooltip("Animasyon hızı bu değerin altına düşemez")]
     [SerializeField] private float minAnimSpeed = 0.7f;
@@ -28,6 +33,13 @@ public class PlayerAnimationController : MonoBehaviour
     private static readonly int IsGroundedBool = Animator.StringToHash("IsGrounded");
     private static readonly int RunSpeedFloat = Animator.StringToHash("RunSpeed");
 
+    // yeni trigger hash'leri
+    private static readonly int TripTrigger = Animator.StringToHash("Trip");
+    private static readonly int CollapseTrigger = Animator.StringToHash("Collapse");
+
+    private bool _collapsed; // collapse bir kere olsun
+
+
     private void Awake()
     {
         _animator = GetComponent<Animator>();
@@ -42,6 +54,16 @@ public class PlayerAnimationController : MonoBehaviour
             verticalMovement.OnQuickDropPerformed += HandleQuickDrop;
             verticalMovement.OnGroundedStatusChanged += HandleGroundedChange;
         }
+        if (combatState != null)
+        {
+            combatState.OnStagger += HandleTrip;
+            combatState.OnFall += HandleCollapse;
+        }
+
+        if (hitResolver != null)
+        {
+            hitResolver.OnGameOver += HandleCollapse; // topa değme gibi durumlar
+        }
     }
 
     private void OnDisable()
@@ -52,10 +74,24 @@ public class PlayerAnimationController : MonoBehaviour
             verticalMovement.OnQuickDropPerformed -= HandleQuickDrop;
             verticalMovement.OnGroundedStatusChanged -= HandleGroundedChange;
         }
+
+        if (combatState != null)
+        {
+            combatState.OnStagger -= HandleTrip;
+            combatState.OnFall -= HandleCollapse;
+        }
+
+        if (hitResolver != null)
+        {
+            hitResolver.OnGameOver -= HandleCollapse;
+        }
     }
+
 
     private void Update()
     {
+        if (_collapsed) return; // collapse olduktan sonra run speed falan kurcalama
+
         UpdateAnimationSpeed();
     }
 
@@ -81,4 +117,23 @@ public class PlayerAnimationController : MonoBehaviour
     private void HandleJump() => _animator.SetTrigger(JumpTrigger);
     private void HandleQuickDrop() => _animator.SetTrigger(FastDropTrigger);
     private void HandleGroundedChange(bool isGrounded) => _animator.SetBool(IsGroundedBool, isGrounded);
+
+    private void HandleTrip()
+    {
+        if (_collapsed) return;
+        _animator.SetTrigger(TripTrigger);
+    }
+
+    private void HandleCollapse()
+    {
+        if (_collapsed) return;
+        _collapsed = true;
+
+        // her ihtimale karşı diğer triggerları resetlemek istersen:
+        _animator.ResetTrigger(JumpTrigger);
+        _animator.ResetTrigger(FastDropTrigger);
+        _animator.ResetTrigger(TripTrigger);
+
+        _animator.SetTrigger(CollapseTrigger);
+    }
 }

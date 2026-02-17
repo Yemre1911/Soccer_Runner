@@ -384,6 +384,8 @@ GameObject:
   - component: {fileID: 93963083}
   - component: {fileID: 93963082}
   - component: {fileID: 93963081}
+  - component: {fileID: 93963084}
+  - component: {fileID: 93963085}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -423,14 +425,14 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
+  m_Radius: 0.84
+  m_Height: 3.08
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.56, z: 0}
 --- !u!23 &93963082
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -488,6 +490,46 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 93963079}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &93963084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93963079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9c72a83c66afbb4698ccfd35bab344b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBodyHitRelay
+  resolver: {fileID: 1331922901}
+--- !u!54 &93963085
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93963079}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
 --- !u!1 &115286146
 GameObject:
   m_ObjectHideFlags: 0
@@ -987,6 +1029,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationController
   verticalMovement: {fileID: 1781460026}
   playerSprint: {fileID: 1781460027}
+  combatState: {fileID: 1781460028}
+  hitResolver: {fileID: 1331922901}
   speedDivisor: 10
   minAnimSpeed: 0.7
   maxAnimSpeed: 1.3
@@ -1452,12 +1496,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OpponentSpawner
   playerTransform: {fileID: 1781460023}
-  spawnAheadZ: 30
   spawnY: 0
-  minX: -3
-  maxX: 3
-  spawnEveryZ: 18
-  randomOffsetZ: 6
+  minDistanceFromOtherOpponents: 6
+  maxTries: 8
   matchSpawnerRotation: 0
 --- !u!1 &371387598
 GameObject:
@@ -2764,6 +2805,7 @@ GameObject:
   - component: {fileID: 878252873}
   - component: {fileID: 878252872}
   - component: {fileID: 878252878}
+  - component: {fileID: 878252879}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Untagged
@@ -2826,7 +2868,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -3023,6 +3065,19 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &878252879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878252871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07f9bb0d842e6e743827d2087306d71c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BallHitRelay
+  resolver: {fileID: 1331922901}
 --- !u!1 &906219573
 GameObject:
   m_ObjectHideFlags: 0
@@ -3901,6 +3956,7 @@ GameObject:
   - component: {fileID: 1331922898}
   - component: {fileID: 1331922899}
   - component: {fileID: 1331922900}
+  - component: {fileID: 1331922901}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3935,6 +3991,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d2fb5370874c4b48b573543ff587135, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  _baseSpeed: 0
 --- !u!114 &1331922899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3962,6 +4019,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 056fb6f951fb2dd40bd42fa17c3d9df0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerformanceManager
+--- !u!114 &1331922901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1331922896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07db8935b1a90ef42b7a9929ce976fd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitResolver
+  playerCombat: {fileID: 1781460028}
+  ball: {fileID: 878252872}
 --- !u!1 &1368648833
 GameObject:
   m_ObjectHideFlags: 0
@@ -5174,6 +5245,7 @@ GameObject:
   - component: {fileID: 1781460024}
   - component: {fileID: 1781460026}
   - component: {fileID: 1781460027}
+  - component: {fileID: 1781460028}
   m_Layer: 0
   m_Name: Player_Root
   m_TagString: Player
@@ -5250,6 +5322,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebae4fef94670e04fbada2dc81f85a96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSprint
+--- !u!114 &1781460028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1781460022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b76c9dfa4f3d99949b2ce8add3ece764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCombatState
+  staggerWindow: 1.5
 --- !u!1 &1826063224
 GameObject:
   m_ObjectHideFlags: 0

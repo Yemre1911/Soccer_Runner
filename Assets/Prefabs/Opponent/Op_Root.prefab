@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 2366098217871307643}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.38, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -106,7 +106,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -114,6 +114,37 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &4813139904137883927
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6365510947465380986}
+  m_Layer: 0
+  m_Name: BallSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6365510947465380986
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4813139904137883927}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.5678521}
+  m_LocalScale: {x: 0.648233, y: 0.648233, z: 0.648233}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2742444422832624718}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7481153132061652640
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,6 +155,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2742444422832624718}
   - component: {fileID: 5998538476628384455}
+  - component: {fileID: 3362013561631486089}
   m_Layer: 0
   m_Name: Op_Root
   m_TagString: Player
@@ -140,11 +172,12 @@ Transform:
   m_GameObject: {fileID: 7481153132061652640}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 9.992006e-16, w: 1}
-  m_LocalPosition: {x: 0, y: -1.00275, z: 45.36047}
-  m_LocalScale: {x: 1.4313, y: 1.4313, z: 1.4313}
+  m_LocalPosition: {x: 0.42786, y: -0.29257, z: 0.25874}
+  m_LocalScale: {x: 1.5426552, y: 1.5426552, z: 1.5426552}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2901546691440860730}
+  - {fileID: 6365510947465380986}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5998538476628384455
@@ -159,7 +192,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac8c5ff6d0089cc41973b03d04fa9a44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChasingOpponent
-  speed: 20
   targetPlayer: {fileID: 0}
   triggerDistance: 20
   curveStrength: 0.65
+--- !u!114 &3362013561631486089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7481153132061652640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aff0257eb08c0f5498c2d1add86dfbd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OpponentIdentity
+  BallSocket: {fileID: 6365510947465380986}

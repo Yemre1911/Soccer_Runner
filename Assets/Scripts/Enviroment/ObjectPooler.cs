@@ -11,6 +11,9 @@ public class ObjectPooler : MonoBehaviour
     [SerializeField] private Transform container;
 
     private readonly List<GameObject> pool = new List<GameObject>();
+    private readonly List<BaseOpponent> activeOpponents = new List<BaseOpponent>();
+
+    public IReadOnlyList<BaseOpponent> ActiveOpponents => activeOpponents;
 
     private void Awake()
     {
@@ -36,9 +39,7 @@ public class ObjectPooler : MonoBehaviour
         }
 
         for (int i = 0; i < initialSize; i++)
-        {
             CreateNewInstance();
-        }
     }
 
     private GameObject CreateNewInstance()
@@ -49,12 +50,10 @@ public class ObjectPooler : MonoBehaviour
         return obj;
     }
 
-    // Pool'dan obje al
-    public GameObject Spawn(Vector3 position, Quaternion rotation)
+    public GameObject Spawn(Vector3 position, Quaternion rotation, Transform playerTransform)
     {
         GameObject obj = null;
 
-        // inactive ara
         for (int i = 0; i < pool.Count; i++)
         {
             if (!pool[i].activeInHierarchy)
@@ -64,25 +63,40 @@ public class ObjectPooler : MonoBehaviour
             }
         }
 
-        // yoksa büyüt (istersen kapatabilirsin)
         if (obj == null)
-        {
             obj = CreateNewInstance();
-        }
 
         obj.transform.SetPositionAndRotation(position, rotation);
         obj.SetActive(true);
+
+        var opp = obj.GetComponent<BaseOpponent>();
+        if (opp != null)
+        {
+            opp.Initialize(playerTransform);
+
+            if (!activeOpponents.Contains(opp))
+                activeOpponents.Add(opp);
+        }
+        else
+        {
+            Debug.LogWarning("[ObjectPooler] Spawnlanan prefab root'ta BaseOpponent yok!");
+        }
+
         return obj;
     }
 
-    // İstersen manuel despawn (şart değil, BaseOpponent zaten kapatıyor)
-    public void Despawn(GameObject obj)
+    public void Despawn(BaseOpponent opp)
     {
-        if (!obj) return;
+        if (!opp) return;
 
-        var opp = obj.GetComponent<BaseOpponent>();
-        if (opp) opp.OnDespawned();
+        opp.OnDespawned();
+        activeOpponents.Remove(opp);
+        opp.gameObject.SetActive(false);
+    }
 
-        obj.SetActive(false);
+    // BaseOpponent içinden çağıracağız:
+    public void NotifyDespawned(BaseOpponent opp)
+    {
+        activeOpponents.Remove(opp);
     }
 }

@@ -92,29 +92,22 @@ public class OpponentSpawner : MonoBehaviour
 
         Quaternion rot = matchSpawnerRotation ? transform.rotation : Quaternion.identity;
 
-        GameObject enemy = ObjectPooler.Instance.Spawn(spawnPos, rot);
-
-        // Prefab ROOT'ta BaseOpponent olmalı
-        BaseOpponent opp = enemy.GetComponent<BaseOpponent>();
-        if (opp != null)
-            opp.Initialize(playerTransform);
-        else
-            Debug.LogWarning("[Spawner] Spawnlanan objede BaseOpponent yok! Prefab root'a ekle.");
+        GameObject enemy = ObjectPooler.Instance.Spawn(spawnPos, rot, playerTransform);
+       
     }
 
     private bool IsTooCloseToOtherOpponents(Vector3 pos)
     {
         if (minDistanceFromOtherOpponents <= 0f) return false;
 
-        // Sahnedeki aktif rakipleri tarar (tag öneririm ama şimdilik basit)
-        // Performans: 1-2 saniyede bir çağrıldığı için dert değil.
-        BaseOpponent[] opponents = FindObjectsOfType<BaseOpponent>(false);
+        var activeList = ObjectPooler.Instance.ActiveOpponents;
 
-        for (int i = 0; i < opponents.Length; i++)
+        for (int i = 0; i < activeList.Count; i++)
         {
-            if (!opponents[i].gameObject.activeInHierarchy) continue;
+            var opp = activeList[i];
+            if (!opp || !opp.gameObject.activeInHierarchy) continue;
 
-            float d = Vector3.Distance(opponents[i].transform.position, pos);
+            float d = Vector3.Distance(opp.transform.position, pos);
             if (d < minDistanceFromOtherOpponents)
                 return true;
         }
