@@ -28,7 +28,7 @@ public class BallController : MonoBehaviour
     }
 
     // --- PLAYER TARAFINDAN ÇAĞRILACAK METOTLAR ---
-    
+
     public void OnPlayerJump()
     {
         // Eğer zaten havadaysak tekrar zıplama (Double jump yoksa)
@@ -50,8 +50,18 @@ public class BallController : MonoBehaviour
     private void SetupPhysics()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true; 
+        rb.isKinematic = true;
         rb.useGravity = false;
-        GetComponent<SphereCollider>().isTrigger = true; 
+        GetComponent<SphereCollider>().isTrigger = true;
+    }
+
+    public void ReleaseBall()
+    {
+        ChangeState(null); // Update çalışmasını durdurur
+        //Rigidbody rb = GetComponent<Rigidbody>();
+        //rb.isKinematic = false;
+        //rb.useGravity = true;
+        //rb.velocity = new Vector3(0, 5f, 5f); // Hafif bir fırlama efekti
+        //transform.SetParent(null); // Karakterden kopar
     }
 }

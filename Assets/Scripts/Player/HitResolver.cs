@@ -1,55 +1,43 @@
 using UnityEngine;
-using System;
+
 public class HitResolver : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] private PlayerCombatState playerCombat;
     [SerializeField] private BallController ball;
-    public event Action OnGameOver;
-
-    public bool IsGameOver { get; private set; }
+    [SerializeField] private SimpleCameraShake cameraShake;
 
     public void NotifyBallHit(OpponentIdentity opp)
     {
-        if (IsGameOver) return;
+        if (GameOver.Instance.IsGameOver) return;
 
-        // Rakip topa değdi -> top rakibe geçsin
+        // Kamera sarsıntısı (GameFeel)
+        if (cameraShake != null) cameraShake.TriggerShake(0.2f, 0.3f);
+
+        // Topu rakibe ver (Görsel efekt için geçici süreliğine)
+        // GameOver çalışınca top zaten Destroy olacak ama o milisaniyede görsel kopmasın.
         if (ball != null && opp != null && opp.BallSocket != null)
         {
             ball.transform.SetParent(opp.BallSocket, true);
             ball.transform.localPosition = Vector3.zero;
-            ball.transform.localRotation = Quaternion.identity;
         }
-        Debug.Log("Top Çalındı");
 
-        EndGame();
+        // FİŞİ ÇEK
+        GameOver.Instance.TriggerGameOver();
     }
 
     public void NotifyPlayerHit(OpponentIdentity opp)
     {
-        if (IsGameOver) return;
+        if (GameOver.Instance.IsGameOver) return;
 
-        // Player state kuralını çalıştır
         playerCombat?.OnHitByOpponent();
 
-        // Eğer bu hit düşmeye sebep olduysa oyunu bitir
         if (playerCombat != null && playerCombat.IsFallen)
         {
-            Debug.Log("Çarpışma");
-            // TODO: top serbest gitsin (bir sonraki adım)
-            EndGame();
+            if (cameraShake != null) cameraShake.TriggerShake(0.3f, 0.5f);
+
+            // FİŞİ ÇEK
+            GameOver.Instance.TriggerGameOver();
         }
-    }
-
-    private void EndGame()
-    {
-        if (IsGameOver) return;
-        IsGameOver = true;
-
-        // TEST: dünya hızı 0
-        if (GameManager.Instance != null)
-            GameManager.Instance.SetSpeedMultiplier(0f);
-
-        OnGameOver?.Invoke();
     }
 }

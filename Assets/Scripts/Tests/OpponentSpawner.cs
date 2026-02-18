@@ -93,7 +93,7 @@ public class OpponentSpawner : MonoBehaviour
         Quaternion rot = matchSpawnerRotation ? transform.rotation : Quaternion.identity;
 
         GameObject enemy = ObjectPooler.Instance.Spawn(spawnPos, rot, playerTransform);
-       
+
     }
 
     private bool IsTooCloseToOtherOpponents(Vector3 pos)
@@ -113,5 +113,36 @@ public class OpponentSpawner : MonoBehaviour
         }
 
         return false;
+    }
+
+
+
+
+
+    private void OnEnable()
+    {
+        // Oyun bitişini dinle
+        if (GameOver.Instance != null)
+            GameOver.Instance.OnGameLost += StopSpawning;
+    }
+
+    private void OnDisable()
+    {
+        if (GameOver.Instance != null)
+            GameOver.Instance.OnGameLost -= StopSpawning;
+    }
+
+    private void StopSpawning()
+    {
+        // 1. Eğer Coroutine kullanıyorsan:
+        StopAllCoroutines();
+
+        // 2. Eğer Invoke kullanıyorsan:
+        CancelInvoke();
+
+        // 3. Scripti tamamen kapat (Update de dursun)
+        this.enabled = false;
+
+        Debug.Log("Spawner Durduruldu.");
     }
 }

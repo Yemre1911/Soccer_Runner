@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerInput : MonoBehaviour
 {
+
+    [SerializeField] private HitResolver hitResolver;
     private IMover _mover;
     private IJumper _jumper;
     private ISprinter _sprinter;
@@ -13,7 +15,7 @@ public class PlayerInput : MonoBehaviour
         _mover = GetComponent<IMover>();
         _jumper = GetComponent<IJumper>();
         _sprinter = GetComponent<ISprinter>();
-        
+
         // SwipeDetection objede yoksa ekle
         _swipeDetector = GetComponent<SwipeDetection>();
         if (_swipeDetector == null) _swipeDetector = gameObject.AddComponent<SwipeDetection>();
@@ -56,5 +58,43 @@ public class PlayerInput : MonoBehaviour
         if (_sprinter == null) return;
         if (isSprinting) _sprinter.StartSprint();
         else _sprinter.StopSprint();
+    }
+
+
+    /*private void OnEnable()
+    {
+        // Oyun bitince inputu kapat emrini dinle
+        if (hitResolver != null)
+            hitResolver.OnGameOver += DisableInput;
+    }
+    private void OnDisable()
+    {
+        // Abonelikten çıkmayı unutma (Memory Leak önlemi)
+        if (hitResolver != null)
+            hitResolver.OnGameOver -= DisableInput;
+    }*/
+
+    private void OnEnable()
+    {
+        if (GameOver.Instance != null)
+            GameOver.Instance.OnGameLost += DisableInput;
+    }
+
+    private void OnDisable()
+    {
+        if (GameOver.Instance != null)
+            GameOver.Instance.OnGameLost -= DisableInput;
+    }
+
+
+    private void DisableInput()
+    {
+        this.enabled = false; // Update döngüsünü durdurur, tuşlar çalışmaz.
+        HandleSprint(false);
+        if (_sprinter is MonoBehaviour sprintScript)
+        {
+            sprintScript.enabled = false;
+        }
+        Debug.Log("Inputlar Devre Dışı!");
     }
 }

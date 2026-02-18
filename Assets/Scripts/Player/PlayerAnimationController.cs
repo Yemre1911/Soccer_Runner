@@ -11,6 +11,9 @@ public class PlayerAnimationController : MonoBehaviour
     [SerializeField] private PlayerCombatState combatState;   // eklendi
     [SerializeField] private HitResolver hitResolver;         // eklendi (topa değip gameover olursa)
 
+    [Header("Effects")]
+    [SerializeField] private SimpleCameraShake cameraShake;
+
 
     [Header("Hız Kalibrasyonu")]
     [Tooltip("Dünya hızını buna böleriz (Senin bulduğun 10 değeri)")]
@@ -60,10 +63,8 @@ public class PlayerAnimationController : MonoBehaviour
             combatState.OnFall += HandleCollapse;
         }
 
-        if (hitResolver != null)
-        {
-            hitResolver.OnGameOver += HandleCollapse; // topa değme gibi durumlar
-        }
+        if (GameOver.Instance != null)
+            GameOver.Instance.OnGameLost += HandleCollapse;
     }
 
     private void OnDisable()
@@ -81,10 +82,10 @@ public class PlayerAnimationController : MonoBehaviour
             combatState.OnFall -= HandleCollapse;
         }
 
-        if (hitResolver != null)
-        {
-            hitResolver.OnGameOver -= HandleCollapse;
-        }
+        if (GameOver.Instance != null)
+            GameOver.Instance.OnGameLost -= HandleCollapse;
+
+
     }
 
 
@@ -122,6 +123,7 @@ public class PlayerAnimationController : MonoBehaviour
     {
         if (_collapsed) return;
         _animator.SetTrigger(TripTrigger);
+        if (cameraShake != null) cameraShake.TriggerShake(0.3f, 0.3f);
     }
 
     private void HandleCollapse()
