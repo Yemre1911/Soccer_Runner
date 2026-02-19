@@ -4,7 +4,7 @@ using UnityEngine;
 public abstract class BaseOpponent : MonoBehaviour
 {
     [Header("Base Settings")]
-    protected float speed = 20f;
+    [SerializeField] protected float speed = 20f;
 
     [Header("Runtime")]
     [SerializeField] protected Transform targetPlayer;

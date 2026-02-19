@@ -111,9 +111,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 2
+  m_Height: 4
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!1 &4813139904137883927
 GameObject:
   m_ObjectHideFlags: 0
@@ -157,7 +157,7 @@ GameObject:
   - component: {fileID: 5998538476628384455}
   - component: {fileID: 3362013561631486089}
   m_Layer: 0
-  m_Name: Op_Root
+  m_Name: Op_Normal
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -172,7 +172,7 @@ Transform:
   m_GameObject: {fileID: 7481153132061652640}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 9.992006e-16, w: 1}
-  m_LocalPosition: {x: 0.42786, y: -0.29257, z: 0.25874}
+  m_LocalPosition: {x: -2.27457, y: -1.00275, z: 1.00282}
   m_LocalScale: {x: 1.5426552, y: 1.5426552, z: 1.5426552}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -192,6 +192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac8c5ff6d0089cc41973b03d04fa9a44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChasingOpponent
+  speed: 20
   targetPlayer: {fileID: 0}
   triggerDistance: 20
   curveStrength: 0.65

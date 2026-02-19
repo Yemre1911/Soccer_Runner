@@ -1481,9 +1481,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5466745335f42064cb5edc9c5c0ac1af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectPooler
-  opponentPrefab: {fileID: 7481153132061652640, guid: ba1d96a8f7ab22440aade44c30d24a37, type: 3}
-  initialSize: 20
-  container: {fileID: 1236727025}
+  pools:
+  - id: Op_Normal
+    prefab: {fileID: 7481153132061652640, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+    initialSize: 12
+    weight: 4
+    containerOverride: {fileID: 1236727025}
+  - id: Op_Slider
+    prefab: {fileID: 8371575962212895824, guid: bae0d7c7f76b59842aed1038f2f7ae91, type: 3}
+    initialSize: 8
+    weight: 1
+    containerOverride: {fileID: 1236727025}
+  defaultContainer: {fileID: 1236727025}
 --- !u!114 &367397845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1497,7 +1506,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OpponentSpawner
   playerTransform: {fileID: 1781460023}
+  minAheadZ: 100
+  maxAheadZ: 105
   spawnY: 0
+  minX: -10
+  maxX: 10
+  minInterval: 0.2
+  maxInterval: 0.7
   minDistanceFromOtherOpponents: 6
   maxTries: 8
   matchSpawnerRotation: 0
@@ -3360,11 +3375,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
   _target: {fileID: 1781460023}
+  _laneCenterRef: {fileID: 2144756993}
   _followSpeed: 5
   _offset: {x: 0, y: 0, z: 0}
   _maxPlayerX: 4
   _followFactorCenter: 1
+  _followFactorEdge: 1
   _yawSpeed: 6
+  _maxCounterYaw: 10
+  _centerDeadZone01: 0.08
+  _counterYawCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _debugDraw: 0
 --- !u!114 &917066092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3397,6 +3441,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CinematicEndCam
   focusTarget: {fileID: 1301205528}
+  photoDistance: 8
   smoothTime: 0.5
   rotationSpeed: 2
   scriptsToDisable:

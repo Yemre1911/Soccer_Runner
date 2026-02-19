@@ -8,7 +8,7 @@ public class CinematicEndCam : MonoBehaviour
 
     [Header("Fotoğraf Modu Ayarları")]
     [Tooltip("Kameranın karakterden ne kadar uzakta duracağı (Derinlik)")]
-    private float photoDistance = 6.0f; // 3 metre geride dur
+    [SerializeField] private float photoDistance = 8.0f; // 3 metre geride dur
 
     [Tooltip("Kameranın yerden/hedef kemikten yüksekliği. (0 = Kemiğin tam hizası, -0.5 = Hafif alttan bakış)")]
     private float photoHeight = 2.0f; // Tam göz/gövde hizası

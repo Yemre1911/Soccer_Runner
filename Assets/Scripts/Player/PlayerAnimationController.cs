@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(Animator))]
 public class PlayerAnimationController : MonoBehaviour
@@ -42,6 +43,8 @@ public class PlayerAnimationController : MonoBehaviour
 
     private bool _collapsed; // collapse bir kere olsun
 
+    private Coroutine _subscribeRoutine; // instance yaratılana kadar almayı deneyen güvenli atama corutini
+
 
     private void Awake()
     {
@@ -51,6 +54,9 @@ public class PlayerAnimationController : MonoBehaviour
 
     private void OnEnable()
     {
+        if (_subscribeRoutine != null) StopCoroutine(_subscribeRoutine);
+        _subscribeRoutine = StartCoroutine(SubscribeGameOverWhenReady());
+
         if (verticalMovement != null)
         {
             verticalMovement.OnJumpPerformed += HandleJump;
@@ -64,11 +70,19 @@ public class PlayerAnimationController : MonoBehaviour
         }
 
         if (GameOver.Instance != null)
+        {
+            Debug.Log("[PAC] Subscribed to GameOver.OnGameLost"); // sonra sil
             GameOver.Instance.OnGameLost += HandleCollapse;
+        }
     }
 
     private void OnDisable()
     {
+        if (_subscribeRoutine != null)
+        {
+            StopCoroutine(_subscribeRoutine);
+            _subscribeRoutine = null;
+        }
         if (verticalMovement != null)
         {
             verticalMovement.OnJumpPerformed -= HandleJump;
@@ -84,8 +98,17 @@ public class PlayerAnimationController : MonoBehaviour
 
         if (GameOver.Instance != null)
             GameOver.Instance.OnGameLost -= HandleCollapse;
+    }
 
+    private IEnumerator SubscribeGameOverWhenReady()
+    {
+        while (GameOver.Instance == null)
+            yield return null; // her frame kontrol
 
+        GameOver.Instance.OnGameLost -= HandleCollapse; // double-subscribe engeli
+        GameOver.Instance.OnGameLost += HandleCollapse;
+
+        Debug.Log("[PAC] Subscribed to GameOver.OnGameLost (delayed)");
     }
 
 
@@ -137,5 +160,6 @@ public class PlayerAnimationController : MonoBehaviour
         _animator.ResetTrigger(TripTrigger);
 
         _animator.SetTrigger(CollapseTrigger);
+        Debug.Log("Collapse Triggered");
     }
 }

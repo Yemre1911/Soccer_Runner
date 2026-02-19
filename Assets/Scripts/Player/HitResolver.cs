@@ -12,7 +12,7 @@ public class HitResolver : MonoBehaviour
         if (GameOver.Instance.IsGameOver) return;
 
         // Kamera sarsıntısı (GameFeel)
-        if (cameraShake != null) cameraShake.TriggerShake(0.2f, 0.3f);
+        if (cameraShake != null) cameraShake.TriggerShake(0.5f, 0.5f);
 
         // Topu rakibe ver (Görsel efekt için geçici süreliğine)
         // GameOver çalışınca top zaten Destroy olacak ama o milisaniyede görsel kopmasın.
