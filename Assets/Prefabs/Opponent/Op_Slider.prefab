@@ -9,16 +9,28 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.6512345
+      objectReference: {fileID: 0}
+    - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.6512345
+      objectReference: {fileID: 0}
+    - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.6512345
+      objectReference: {fileID: 0}
+    - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.67
+      value: -0.0000076914
       objectReference: {fileID: 0}
     - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0
+      value: -0.95
       objectReference: {fileID: 0}
     - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.12
+      value: 0.01976
       objectReference: {fileID: 0}
     - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: m_LocalRotation.w
@@ -26,15 +38,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 9.992006e-16
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2742444422832624718, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -48,10 +60,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4065491158224280353, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0ca4f2b4fb5666940867fdee88493a09, type: 2}
+    - target: {fileID: 4065491158224280353, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b133a2673e707f94bafcca8fa255cbf1, type: 2}
     - target: {fileID: 6927183304333272499, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: b133a2673e707f94bafcca8fa255cbf1, type: 2}
+      objectReference: {fileID: 2100000, guid: 05d18406b8cb2dd49830f2bcbc9b40e4, type: 2}
     - target: {fileID: 7481153132061652640, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: m_Name
       value: Op_Slider
@@ -68,6 +88,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 2154219938812475901}
   m_SourcePrefab: {fileID: 100100000, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+--- !u!95 &4797810734022215521 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+  m_PrefabInstance: {fileID: 1441058253410925296}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &8371575962212895824 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7481153132061652640, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
@@ -110,5 +135,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlidingOpponent
   speed: 30
   targetPlayer: {fileID: 0}
+  animator: {fileID: 4797810734022215521}
   triggerDistance: 6
   curveStrength: 0.35
