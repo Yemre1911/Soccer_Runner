@@ -199,8 +199,8 @@ public class OpponentSpawner : MonoBehaviour
     [SerializeField] private float maxX = 10f;
 
     [Header("Frequency (seconds)")]
-    [SerializeField] private float minInterval = 0.2f;
-    [SerializeField] private float maxInterval = 0.7f;
+    private float minInterval = 0.5f;
+    private float maxInterval = 1f;
 
     [Header("Anti-Cluster (opsiyonel)")]
     [SerializeField] private float minDistanceFromOtherOpponents = 6f;

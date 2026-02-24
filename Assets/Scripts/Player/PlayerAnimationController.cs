@@ -6,6 +6,7 @@ public class PlayerAnimationController : MonoBehaviour
 {
     [Header("Referanslar")]
     [SerializeField] private PlayerVerticalMovement verticalMovement;
+    [SerializeField] private PlayerLateralMovement lateralMovement;
     [SerializeField] private PlayerSprint playerSprint;
 
     [Header("Combat / Game")]
@@ -41,6 +42,10 @@ public class PlayerAnimationController : MonoBehaviour
     private static readonly int TripTrigger = Animator.StringToHash("Trip");
     private static readonly int CollapseTrigger = Animator.StringToHash("Collapse");
 
+    private static readonly int SpinTrigger = Animator.StringToHash("Spin");
+    private static readonly int SpinMirrorBool = Animator.StringToHash("SpinMirror");
+    private bool _isGrounded;
+
     private bool _collapsed; // collapse bir kere olsun
 
     private Coroutine _subscribeRoutine; // instance yaratılana kadar almayı deneyen güvenli atama corutini
@@ -63,6 +68,8 @@ public class PlayerAnimationController : MonoBehaviour
             verticalMovement.OnQuickDropPerformed += HandleQuickDrop;
             verticalMovement.OnGroundedStatusChanged += HandleGroundedChange;
         }
+        if (lateralMovement != null)
+            lateralMovement.OnLaneChangeRequested += HandleLaneChange;
         if (combatState != null)
         {
             combatState.OnStagger += HandleTrip;
@@ -89,6 +96,8 @@ public class PlayerAnimationController : MonoBehaviour
             verticalMovement.OnQuickDropPerformed -= HandleQuickDrop;
             verticalMovement.OnGroundedStatusChanged -= HandleGroundedChange;
         }
+        if (lateralMovement != null)
+            lateralMovement.OnLaneChangeRequested -= HandleLaneChange;
 
         if (combatState != null)
         {
@@ -140,7 +149,12 @@ public class PlayerAnimationController : MonoBehaviour
     // --- Event Handlers ---
     private void HandleJump() => _animator.SetTrigger(JumpTrigger);
     private void HandleQuickDrop() => _animator.SetTrigger(FastDropTrigger);
-    private void HandleGroundedChange(bool isGrounded) => _animator.SetBool(IsGroundedBool, isGrounded);
+    //private void HandleGroundedChange(bool isGrounded) => _animator.SetBool(IsGroundedBool, isGrounded);
+    private void HandleGroundedChange(bool isGrounded)
+    {
+        _isGrounded = isGrounded;
+        _animator.SetBool(IsGroundedBool, isGrounded);
+    }
 
     private void HandleTrip()
     {
@@ -161,5 +175,30 @@ public class PlayerAnimationController : MonoBehaviour
 
         _animator.SetTrigger(CollapseTrigger);
         Debug.Log("Collapse Triggered");
+    }
+
+    private void HandleLaneChange(int direction)
+    {
+        TryPlaySpin(direction); // önceki yazdığım grounded/%50/mirror logic
+    }
+
+    public void TryPlaySpin(int direction)
+    {
+        if (_collapsed) return;
+        if (!_isGrounded) return;                 // havadayken ASLA
+        if (direction == 0) return;
+
+        // Zaten Spin oynuyorsa tekrar tetikleme
+        var state = _animator.GetCurrentAnimatorStateInfo(0);
+        if (state.IsName("Spin")) return;
+
+        // %50 şans
+        if (Random.value > 0.2f) return;
+
+        // sağdan sola giderken mirror
+        bool mirror = direction < 0;
+        _animator.SetBool(SpinMirrorBool, mirror);
+
+        _animator.SetTrigger(SpinTrigger);
     }
 }

@@ -61,19 +61,6 @@ public class PlayerInput : MonoBehaviour
     }
 
 
-    /*private void OnEnable()
-    {
-        // Oyun bitince inputu kapat emrini dinle
-        if (hitResolver != null)
-            hitResolver.OnGameOver += DisableInput;
-    }
-    private void OnDisable()
-    {
-        // Abonelikten çıkmayı unutma (Memory Leak önlemi)
-        if (hitResolver != null)
-            hitResolver.OnGameOver -= DisableInput;
-    }*/
-
     private void OnEnable()
     {
         if (GameOver.Instance != null)
@@ -89,6 +76,7 @@ public class PlayerInput : MonoBehaviour
 
     private void DisableInput()
     {
+        _swipeDetector.enabled = false;
         this.enabled = false; // Update döngüsünü durdurur, tuşlar çalışmaz.
         HandleSprint(false);
         if (_sprinter is MonoBehaviour sprintScript)

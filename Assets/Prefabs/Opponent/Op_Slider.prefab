@@ -60,6 +60,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3491637009888024609, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+      propertyPath: m_Height
+      value: 2.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 3491637009888024609, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3491637009888024609, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+      propertyPath: m_Center.y
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 4065491158224280353, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -68,6 +80,14 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[2]'
       value: 
       objectReference: {fileID: 2100000, guid: b133a2673e707f94bafcca8fa255cbf1, type: 2}
+    - target: {fileID: 5196270594850290241, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5196270594850290241, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6927183304333272499, guid: cbe490a94f820f845a7c51dd85dc6bff, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -115,7 +135,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 1
@@ -133,8 +153,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 898fec894df1b7847930b1b0d2e40b8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlidingOpponent
-  speed: 30
+  speed: 20
   targetPlayer: {fileID: 0}
   animator: {fileID: 4797810734022215521}
-  triggerDistance: 6
+  triggerDistance: 10
   curveStrength: 0.35

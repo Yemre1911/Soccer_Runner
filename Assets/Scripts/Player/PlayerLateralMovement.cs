@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;         
 
 public class PlayerLateralMovement : MonoBehaviour, IMover
 {
@@ -17,6 +18,9 @@ public class PlayerLateralMovement : MonoBehaviour, IMover
     public float TargetX { get; private set; }
     private float _currentVelocity;
 
+    public event Action<int> OnLaneChangeRequested; // -1 / +1
+
+
     private void Start()
     {
         TargetX = transform.position.x;
@@ -26,6 +30,8 @@ public class PlayerLateralMovement : MonoBehaviour, IMover
     {
         TargetX += direction * stepSize;
         TargetX = Mathf.Clamp(TargetX, -roadWidth, roadWidth);
+
+        OnLaneChangeRequested?.Invoke(direction); // spin animsayonu için bir event
     }
 
     private void Update()
