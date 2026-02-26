@@ -1515,8 +1515,6 @@ MonoBehaviour:
   spawnY: 0
   minX: -10
   maxX: 10
-  minInterval: 0.2
-  maxInterval: 0.7
   minDistanceFromOtherOpponents: 6
   maxTries: 8
   matchSpawnerRotation: 0
@@ -3455,7 +3453,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 65
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -3482,7 +3480,7 @@ Transform:
   m_GameObject: {fileID: 917066086}
   serializedVersion: 2
   m_LocalRotation: {x: 0.33883783, y: 0.0000000032612297, z: 0.0000000478192, w: 0.94084483}
-  m_LocalPosition: {x: 2.66915, y: 12.11, z: -4.9660997}
+  m_LocalPosition: {x: 2.67, y: 15.89, z: -6.94}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4587,7 +4585,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d2fb5370874c4b48b573543ff587135, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  _initialSpeed: 10
+  _acceleration: 0.1
   _baseSpeed: 0
+  _speedMultiplier: 1
 --- !u!114 &1331922899
 MonoBehaviour:
   m_ObjectHideFlags: 0
