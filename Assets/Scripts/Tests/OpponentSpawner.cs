@@ -21,12 +21,12 @@ public class OpponentSpawner : MonoBehaviour
 
     [Header("Group / Team Feel")]
     [SerializeField] private bool enableGroups = true;
-    [SerializeField, Range(0f, 1f)] private float groupChance = 0.33f;
+    [SerializeField, Range(0f, 1f)] private float groupChance = 0.3f;
     [SerializeField] private Vector2Int groupSizeRange = new Vector2Int(2, 3);
     [SerializeField] private float groupZSpacing = 3f;
 
     [Header("Anti-Cluster (optional)")]
-    [SerializeField] private float minDistanceFromOtherOpponents = 6f;
+    [SerializeField] private float minDistanceFromOtherOpponents = 8f;
     [SerializeField] private int maxTries = 8;
 
     [Header("Rotation")]
@@ -77,7 +77,23 @@ public class OpponentSpawner : MonoBehaviour
     }
 
     // -------------------- Public API (Director için) --------------------
+    public void ApplyTuning(SessionTuning.OpponentSpawnTuning t)
+    {
+        if (t == null) return;
 
+        ConfigureGaps(t.minGapMeters, t.maxGapMeters);
+
+        enableGroups = t.enableGroups;
+        groupChance = Mathf.Clamp01(t.groupChance);
+        groupSizeRange = t.groupSizeRange;
+        groupZSpacing = Mathf.Max(0.1f, t.groupZSpacing);
+
+        minDistanceFromOtherOpponents = Mathf.Max(0f, t.minDistanceFromOtherOpponents);
+        maxTries = Mathf.Clamp(t.maxTries, 1, 100);
+
+        // Tuning uygulandıktan sonra schedule’ı temizlemek iyi hissettirir
+        ResetSchedule();
+    }
     public void SetSpawningEnabled(bool enabled)
     {
         spawningEnabled = enabled;

@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 /// <summary>
 /// CoinPatternSpawner v2 (LaneReservation YOK)
@@ -20,8 +20,8 @@ public class CoinPatternSpawner : MonoBehaviour
     [SerializeField] private CoinMode mode = CoinMode.Wave;
 
     [Header("Spawn Band (Player'ın önünde)")]
-    [SerializeField] private float minAheadZ = 90f;
-    [SerializeField] private float maxAheadZ = 130f;
+    [SerializeField] private float minAheadZ = 80f;
+    [SerializeField] private float maxAheadZ = 115f;
     [SerializeField] private float spawnY = 0f;
 
     [Header("ANTI-OVERLAP (Group spacing)")]
@@ -33,17 +33,17 @@ public class CoinPatternSpawner : MonoBehaviour
 
     [Header("WAVE (Longer groups + less frequent)")]
     [Tooltip("Wave spawn eventleri arası mesafe (metre) - büyüttük => daha seyrek.")]
-    [SerializeField] private Vector2 waveGapMeters = new Vector2(35f, 55f);
+    [SerializeField] private Vector2 waveGapMeters = new Vector2(18f, 30f);
 
     [Tooltip("Wave coin grubu uzunluğu (coin sayısı) - büyüttük => daha uzun gruplar.")]
-    [SerializeField] private Vector2Int waveStripLen = new Vector2Int(10, 18);
+    [SerializeField] private Vector2Int waveStripLen = new Vector2Int(5, 9);
 
     [Tooltip("Wave coin aralığı (Z). Daha küçük => daha sıkı görünür.")]
-    [SerializeField] private float waveZSpacing = 2.0f;
+    [SerializeField] private float waveZSpacing = 3.0f;
 
     [Tooltip("Wave: X random aralık")]
-    [SerializeField] private float waveMinX = -9f;
-    [SerializeField] private float waveMaxX = 9f;
+    [SerializeField] private float waveMinX = -10f;
+    [SerializeField] private float waveMaxX = 10f;
 
     [Tooltip("Wave: grupların 'aynı çizgi' olmaması için küçük X jitter")]
     [SerializeField] private float waveXJitter = 0.6f;
@@ -56,14 +56,24 @@ public class CoinPatternSpawner : MonoBehaviour
     [SerializeField] private float[] breakLaneX = new float[] { -6f, -2f, 2f, 6f };
 
     [Tooltip("Break şerit uzunluğu (coin sayısı) - 'upuzun' istiyorsun.")]
-    [SerializeField] private int breakCoinsPerLane = 30;
+    [SerializeField] private int breakCoinsPerLane = 15;
 
     [Tooltip("Break coin aralığı (Z).")]
-    [SerializeField] private float breakZSpacing = 1.9f;
+    [SerializeField] private float breakZSpacing = 3f;
 
     [Header("Optional Hard Cap")]
     [Tooltip("0 = limit yok. Çok coin istemiyorsan 0'dan büyük ver.")]
     [SerializeField] private int maxCoinsPerEventHardCap = 0;
+
+    // ✅ NEW: Break'e girince Wave'den kalmış coinleri temizle
+    [Header("Mode Transition Cleanup")]
+    [SerializeField] private bool clearAheadCoinsOnBreak = true;
+
+    [Tooltip("Break'e girerken player'ın önünde bu mesafeye kadar coinleri temizler.")]
+    [SerializeField] private float clearAheadDistanceOnBreak = 300f;
+
+    [Tooltip("Break'e girerken player'ın arkasında da küçük bir tampon temizlemek istersen.")]
+    [SerializeField] private float clearBehindDistanceOnBreak = 10f;
 
     // --- internals ---
     private bool _initialized;
@@ -140,6 +150,18 @@ public class CoinPatternSpawner : MonoBehaviour
         {
             // Break'e girince anında spawn için flag sıfırla
             _breakInstantSpawned = false;
+
+            // ✅ PROFESYONEL ÇÖZÜM:
+            // Break'e girerken Wave döneminden "önceden spawn edilmiş" coinleri temizle.
+            if (clearAheadCoinsOnBreak)
+                ClearCoinsInFrontBand();
+
+            // Break'e geçince overlap state'i sıfırlamak mantıklı
+            _lastGroupEndZ = float.NegativeInfinity;
+
+            // Break'te schedule'ı stabilize et
+            _initialized = true;
+            _nextAtDistance = float.PositiveInfinity;
         }
         else
         {
@@ -151,6 +173,10 @@ public class CoinPatternSpawner : MonoBehaviour
     public void ResetSchedule()
     {
         if (GameManager.Instance == null) return;
+
+        _breakInstantSpawned = false;             // güvenli
+        _lastGroupEndZ = float.NegativeInfinity;  // ✅ önemli
+
         _initialized = false; // yeniden init
         InitSchedule(GameManager.Instance.RunDistance);
     }
@@ -175,6 +201,26 @@ public class CoinPatternSpawner : MonoBehaviour
         return Random.Range(min, max);
     }
 
+    // ---------------- Cleanup (Break transition) ----------------
+
+    private void ClearCoinsInFrontBand()
+    {
+        if (!ItemPooler.Instance || !playerTransform) return;
+
+        float playerZ = playerTransform.position.z;
+
+        float minZ = playerZ - Mathf.Max(0f, clearBehindDistanceOnBreak);
+        float maxZ = playerZ + Mathf.Max(0f, clearAheadDistanceOnBreak);
+
+        // SADECE coinPoolId aktiflerini temizle
+        ItemPooler.Instance.DespawnActiveWhere(coinPoolId, go =>
+        {
+            if (!go) return false;
+            float z = go.transform.position.z;
+            return z >= minZ && z <= maxZ;
+        });
+    }
+
     // ---------------- Spawn Helpers ----------------
 
     private float PickBaseZ(int groupCoinCount, float zSpacing)
@@ -189,7 +235,6 @@ public class CoinPatternSpawner : MonoBehaviour
         float intendedEndZ = baseZ + groupLenZ;
 
         // Önceki grubun bitişi ile çakışmasın:
-        // Yeni grubun başlangıcı, _lastGroupEndZ + minSeparationZ'in gerisindeyse ileri it.
         float minAllowedBaseZ = _lastGroupEndZ + minSeparationZ;
 
         if (baseZ < minAllowedBaseZ)
@@ -199,14 +244,13 @@ public class CoinPatternSpawner : MonoBehaviour
             intendedEndZ = baseZ + groupLenZ;
         }
 
-        // Spawn bandı çok geride kaldıysa (ör: push yüzünden) yine de player'ın önünde kalsın
+        // Spawn bandı çok geride kaldıysa yine de player'ın önünde kalsın
         if (baseZ < playerZ + minAheadZ)
         {
             baseZ = playerZ + minAheadZ;
             intendedEndZ = baseZ + groupLenZ;
         }
 
-        // last end güncelle
         _lastGroupEndZ = Mathf.Max(_lastGroupEndZ, intendedEndZ);
 
         return baseZ;
@@ -223,6 +267,7 @@ public class CoinPatternSpawner : MonoBehaviour
         float baseZ = PickBaseZ(len, waveZSpacing);
 
         // ✅ Şerit gibi: tek bir X seç, tüm coinlerde aynı kalsın
+        // (waveXJitter'ı şu an kullanmıyoruz; değerlerini bozmadım)
         float x = Random.Range(waveMinX, waveMaxX);
 
         for (int i = 0; i < len; i++)
@@ -246,9 +291,6 @@ public class CoinPatternSpawner : MonoBehaviour
         int total = laneCount * coinsPerLane;
         if (maxCoinsPerEventHardCap > 0) total = Mathf.Min(total, maxCoinsPerEventHardCap);
 
-        // baseZ: Break anında "hemen karşıma çıksın" => minAheadZ yakınından başlat
-        // Ayrıca önceki wave grubu ile çakışmasın diye PickBaseZ mantığını kullanıyoruz.
-        // Burada groupCount = coinsPerLane (en uzun lane), spacing = breakZSpacing
         float baseZ = PickBaseZ(coinsPerLane, breakZSpacing);
 
         int spawned = 0;
@@ -268,6 +310,93 @@ public class CoinPatternSpawner : MonoBehaviour
                 ItemPooler.Instance.Spawn(coinPoolId, pos, Quaternion.identity);
                 spawned++;
             }
+        }
+    }
+}*/
+using UnityEngine;
+
+public class CoinPatternSpawner : MonoBehaviour
+{
+    public enum CoinMode { Wave, Break }
+
+    [Header("References")]
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private string coinPoolId = "coin";
+
+    [Header("Runtime")]
+    public bool spawningEnabled = true;
+    public CoinMode mode = CoinMode.Wave;
+
+    [Header("Spawn Settings")]
+    [Tooltip("Player'ın ne kadar ilerisine spawn edilecek?")]
+    public float spawnDistanceAhead = 100f; 
+    public Vector2 waveGapMeters = new Vector2(18f, 30f);
+    public Vector2Int waveStripLen = new Vector2Int(5, 9);
+    public float waveZSpacing = 3.0f;
+    public float waveMinX = -10f;
+    public float waveMaxX = 10f;
+    public float spawnY = 0f;
+
+    private float _nextSpawnDistance;
+
+    private void Start()
+    {
+        TriggerImmediateSpawn();
+    }
+
+    private void Update()
+    {
+        if (!spawningEnabled || GameManager.Instance == null) return;
+        
+        // 1. Break anında spawn tamamen iptal
+        if (mode == CoinMode.Break) return;
+
+        // 2. Wave modundayken hedef mesafeye ulaşıldığında spawn yap
+        if (GameManager.Instance.RunDistance >= _nextSpawnDistance)
+        {
+            SpawnCoinGroup();
+            SetNextTargetDistance();
+        }
+    }
+
+    public void SetMode(CoinMode newMode)
+    {
+        if (mode == newMode) return;
+        mode = newMode;
+
+        // Wave tekrar başladığında sistemi beklemeden hemen spawn yapması için tetikle
+        if (mode == CoinMode.Wave)
+        {
+            TriggerImmediateSpawn();
+        }
+    }
+
+    private void TriggerImmediateSpawn()
+    {
+        if (GameManager.Instance != null)
+        {
+            // Wave başlar başlamaz (sadece 1 metre sonra) ilk grubu at
+            _nextSpawnDistance = GameManager.Instance.RunDistance + 1f; 
+        }
+    }
+
+    private void SetNextTargetDistance()
+    {
+        _nextSpawnDistance = GameManager.Instance.RunDistance + Random.Range(waveGapMeters.x, waveGapMeters.y);
+    }
+
+    private void SpawnCoinGroup()
+    {
+        if (playerTransform == null || ItemPooler.Instance == null) return;
+
+        int coinCount = Random.Range(waveStripLen.x, waveStripLen.y + 1);
+        float baseZ = playerTransform.position.z + spawnDistanceAhead;
+        float xPos = Random.Range(waveMinX, waveMaxX); // Tek şerit hizası
+
+        for (int i = 0; i < coinCount; i++)
+        {
+            Vector3 pos = new Vector3(xPos, spawnY, baseZ + (i * waveZSpacing));
+            ItemPooler.Instance.Spawn(coinPoolId, pos, Quaternion.identity);
         }
     }
 }

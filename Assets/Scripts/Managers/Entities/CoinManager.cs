@@ -21,6 +21,7 @@ public class CoinManager : MonoBehaviour
         if (amount <= 0) return;
         Coins += amount;
         OnCoinsChanged?.Invoke(Coins);
+        Debug.Log($"[CoinManager] Coins={Coins}");
     }
 
     public void ResetCoins()

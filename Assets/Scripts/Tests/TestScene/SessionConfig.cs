@@ -4,14 +4,11 @@ using UnityEngine;
 [Serializable]
 public class SessionConfig
 {
-    [Header("Level")]
     public int levelNumber = 1;
-    public float levelLengthMeters = 5000f;   // süre yerine mesafe mantığı
+    public float levelLengthMeters = 5000f;
 
-    [Header("Difficulty")]
-    [Range(0, 10)] public int difficulty = 1;
+    public Difficulty difficulty = Difficulty.Easy;
 
-    [Header("Environment / Visual IDs (şimdilik string)")]
     public string environmentId = "default_env";
     public string[] opponentJerseyIds = { "jersey_a", "jersey_b" };
 
@@ -21,7 +18,7 @@ public class SessionConfig
         {
             levelNumber = 1,
             levelLengthMeters = 5000f,
-            difficulty = 1,
+            difficulty = Difficulty.Easy,
             environmentId = "default_env",
             opponentJerseyIds = new[] { "jersey_a", "jersey_b" }
         };

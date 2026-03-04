@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f11385d9465fef44b9c91d7d0e559b17, type: 3}
+  m_Name: TuningProvider_Default
+  m_EditorClassIdentifier: Assembly-CSharp::SessionTuningProviderSO
+  easy: {fileID: 11400000, guid: 2d104a4f596fc9443bfd41c9044c9850, type: 2}
+  medium: {fileID: 11400000, guid: 6f6944f46ac08764e90b61e80ac5a975, type: 2}
+  hard: {fileID: 11400000, guid: ef0445566faf4f24db55bcde5c1bb988, type: 2}
