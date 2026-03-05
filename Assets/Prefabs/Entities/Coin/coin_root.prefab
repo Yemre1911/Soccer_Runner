@@ -14,6 +14,10 @@ GameObject:
   - component: {fileID: 6762271648014054183}
   - component: {fileID: -8957606090823836922}
   - component: {fileID: -4321024485691446447}
+  - component: {fileID: 7876106877256279561}
+  - component: {fileID: -4627013284242319288}
+  - component: {fileID: -4025351278890047342}
+  - component: {fileID: 7654577064633105991}
   m_Layer: 0
   m_Name: coin_root
   m_TagString: Untagged
@@ -67,7 +71,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 902862477830993645}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6cdb4d2b1b8b3f549a8bbab8d01f8b57, type: 3}
   m_Name: 
@@ -95,7 +99,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 902862477830993645}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: acb06975ec523d348bdf21c4276d758b, type: 3}
   m_Name: 
@@ -109,11 +113,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 902862477830993645}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a50f6d3fa2633d4c87912a3a3748643, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CoinAttractPickup
+  value: 1
   playerTag: Player
   coinTrigger: {fileID: 5261792672945153984}
   visualRoot: {fileID: 6806553427314626346}
@@ -147,6 +152,94 @@ MonoBehaviour:
   scaleDownDuration: 0.5
   endScaleMultiplier: 0
   disableSpinWhileAttract: 0
+--- !u!114 &7876106877256279561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902862477830993645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb06975ec523d348bdf21c4276d758b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSpin
+  degreesPerSecond: 90
+  axis: {x: 0, y: 0, z: 0}
+--- !u!114 &-4627013284242319288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902862477830993645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43c6854ee7915cf4aa6a631f3bd807d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttractPickup
+  playerTag: Player
+  triggerCollider: {fileID: 5261792672945153984}
+  visualRoot: {fileID: 6806553427314626346}
+  duration: 0.22
+  finishDistance: 0.25
+  ease:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  targetOffset: {x: 0, y: 1, z: 0}
+  scaleDownDuration: 0.2
+  endScaleMultiplier: 0
+  disableSpinWhileAttract: 1
+  effects:
+  - {fileID: -4025351278890047342}
+  - {fileID: 7654577064633105991}
+--- !u!114 &-4025351278890047342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902862477830993645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f942f93b64a9204f97e1174b7253255, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AddCoinsEffect
+  value: 1
+--- !u!114 &7654577064633105991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902862477830993645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 973b3b0c79716bb48b94cec7f4f1e8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LogPickupEffect
+  message: 'Got: Coin'
 --- !u!1 &4259482159338714020
 GameObject:
   m_ObjectHideFlags: 0

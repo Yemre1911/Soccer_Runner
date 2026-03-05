@@ -11,6 +11,10 @@ GameObject:
   - component: {fileID: 2855089531877084159}
   - component: {fileID: 2225650491635379601}
   - component: {fileID: 6439475560289473408}
+  - component: {fileID: -1242625874231813405}
+  - component: {fileID: -1888840556160684921}
+  - component: {fileID: -4391091227062737855}
+  - component: {fileID: 4893254674176360007}
   m_Layer: 0
   m_Name: E_Gem
   m_TagString: Untagged
@@ -72,6 +76,92 @@ MonoBehaviour:
   worldDirection: {x: 0, y: 0, z: -1}
   despawnBehindPlayerZ: 15
   playerTag: Player
+--- !u!114 &-1242625874231813405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8363727919358064478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb06975ec523d348bdf21c4276d758b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSpin
+  degreesPerSecond: 90
+  axis: {x: 0, y: 0, z: 0}
+--- !u!114 &-1888840556160684921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8363727919358064478}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b3775f9d37f17e48b92504ce425f966, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PooledItem
+--- !u!114 &-4391091227062737855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8363727919358064478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43c6854ee7915cf4aa6a631f3bd807d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttractPickup
+  playerTag: Player
+  triggerCollider: {fileID: 2225650491635379601}
+  visualRoot: {fileID: 2855089531877084159}
+  duration: 0.22
+  finishDistance: 0.25
+  ease:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  targetOffset: {x: 0, y: 1, z: 0}
+  scaleDownDuration: 0.2
+  endScaleMultiplier: 0
+  disableSpinWhileAttract: 1
+  effects:
+  - {fileID: 4893254674176360007}
+--- !u!114 &4893254674176360007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8363727919358064478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 973b3b0c79716bb48b94cec7f4f1e8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LogPickupEffect
+  message: 'Got: Gem'
 --- !u!1 &8679154148183032588
 GameObject:
   m_ObjectHideFlags: 0
