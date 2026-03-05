@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GameManager : MonoBehaviour, IGameSpeed
+public class GameManager : MonoBehaviour, IGameSpeed, IRunDistance
 {
     public static GameManager Instance { get; private set; }
 

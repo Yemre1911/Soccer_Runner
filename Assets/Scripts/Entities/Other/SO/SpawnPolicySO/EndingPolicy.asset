@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d835fc621a23f3e4b9ce1772c3aeff04, type: 3}
+  m_Name: EndingPolicy
+  m_EditorClassIdentifier: Assembly-CSharp::WeightedSpawnPolicySO
+  activeInPhases: 8
+  minGapMeters: 40
+  maxGapMeters: 80
+  minAheadMeters: 60
+  maxAheadMeters: 140
+  hardMaxAheadMeters: 190
+  minX: -8
+  maxX: 8
+  spawnY: 0
+  zJitter: 0
+  globalMinSeparationMeters: 25
+  items:
+  - {fileID: 11400000, guid: c5acee23c23844b46b918adf3a849ea1, type: 2}
+  - {fileID: 11400000, guid: f658eafd955b585408dae684c040e8a0, type: 2}
+  - {fileID: 11400000, guid: 2000aa32eb0940b4398e38b6a8588cfe, type: 2}
+  - {fileID: 11400000, guid: e0dd38330e2ff2f4b9a1c52344d3b6d5, type: 2}
+  - {fileID: 11400000, guid: 3b9bac40751416a4598865e879ffcca6, type: 2}
+  - {fileID: 11400000, guid: 83c94ccc0c5fc2542aad929313e7e942, type: 2}
+  - {fileID: 11400000, guid: 534efb44e472736489a132a0b9427b48, type: 2}
+  - {fileID: 11400000, guid: 39144ce8907c3fc4d9dac9e0fa2ba2e1, type: 2}
+  - {fileID: 11400000, guid: 2ba136cb7b0eeac4ab66c159b2b82985, type: 2}
