@@ -2805,7 +2805,7 @@ GameObject:
   - component: {fileID: 3362013561631486089}
   m_Layer: 0
   m_Name: Op_Normal
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2843,6 +2843,15 @@ MonoBehaviour:
   speed: 15
   targetPlayer: {fileID: 0}
   animator: {fileID: 5866666021909216657}
+  scaleAnimatorSpeed: 1
+  worldSpeedReference: 10
+  animatorSpeedMultiplier: 1
+  animatorSpeedMin: 0.85
+  animatorSpeedMax: 1.75
+  syncMoveSpeedToWorld: 1
+  worldSpeedReferenceOverride: 0
+  moveSyncMultiplier: 1
+  moveSyncExponent: 1
   curveTriggerDistance: 20
   curveStrength: 0.65
   attackDistanceMin: 5

@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Tuning_Hard
   m_EditorClassIdentifier: Assembly-CSharp::SessionTuning
   overrideLevelLength: 1
-  levelLengthMeters: 3000
-  startingDistance: 100
-  waveDistance: 800
+  levelLengthMeters: 1520
+  startingDistance: 20
+  waveDistance: 400
   breakDistance: 150
   opponentSpawn:
     minGapMeters: 10
