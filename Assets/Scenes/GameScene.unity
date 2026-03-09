@@ -849,7 +849,7 @@ MonoBehaviour:
   resolver: {fileID: 1331922901}
   opponentHitLayers:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 384
 --- !u!54 &93963085
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5026,6 +5026,7 @@ MonoBehaviour:
   sessionDirector: {fileID: 1379950494}
   leftLauncher: {fileID: 1617019157}
   rightLauncher: {fileID: 157391263}
+  cameraShake: {fileID: 1780024328}
   projectilePoolIds:
   - aud_chair
   - aud_fireTorch
@@ -5040,6 +5041,7 @@ MonoBehaviour:
   edgeBias: 2.2
   throwDuration: 2
   arcHeight: 16
+  firstSpawnDelayMeters: 8
   log: 1
 --- !u!1 &998065512
 GameObject:
@@ -8549,6 +8551,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a300425a8da7924d9d02816e0949157, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleCameraShake
+  ambientX: 0.35
+  ambientY: 0.2
+  ambientFrequency: 10
+  ambientBlendSpeed: 20
 --- !u!4 &1780024329
 Transform:
   m_ObjectHideFlags: 0

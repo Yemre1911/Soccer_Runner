@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: Tuning_Easy
   m_EditorClassIdentifier: Assembly-CSharp::SessionTuning
   overrideLevelLength: 1
-  levelLengthMeters: 2000
-  startingDistance: 100
-  waveDistance: 400
-  breakDistance: 100
+  levelLengthMeters: 1010
+  startingDistance: 20
+  waveDistance: 250
+  breakDistance: 120
   opponentSpawn:
     minGapMeters: 10
     maxGapMeters: 12
     enableGroups: 0
-    groupChance: 0.3
+    groupChance: 0
     groupSizeRange: {x: 2, y: 3}
     groupZSpacing: 3
     minDistanceFromOtherOpponents: 8

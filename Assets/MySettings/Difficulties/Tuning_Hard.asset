@@ -21,7 +21,7 @@ MonoBehaviour:
     minGapMeters: 10
     maxGapMeters: 12
     enableGroups: 1
-    groupChance: 0.4
+    groupChance: 0.2
     groupSizeRange: {x: 2, y: 3}
     groupZSpacing: 3
     minDistanceFromOtherOpponents: 8
