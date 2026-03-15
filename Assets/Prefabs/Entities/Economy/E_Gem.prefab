@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -1888840556160684921}
   - component: {fileID: -4391091227062737855}
   - component: {fileID: 4893254674176360007}
+  - component: {fileID: 1254558256765866382}
   m_Layer: 0
   m_Name: E_Gem
   m_TagString: Untagged
@@ -148,7 +149,7 @@ MonoBehaviour:
   endScaleMultiplier: 0
   disableSpinWhileAttract: 1
   effects:
-  - {fileID: 4893254674176360007}
+  - {fileID: 1254558256765866382}
 --- !u!114 &4893254674176360007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,6 +163,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogPickupEffect
   message: 'Got: Gem'
+--- !u!114 &1254558256765866382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8363727919358064478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f981b9b830f78242a1117360493c038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrantItemPickupEffect
+  itemDefinition: {fileID: 11400000, guid: 2ba136cb7b0eeac4ab66c159b2b82985, type: 2}
 --- !u!1 &8679154148183032588
 GameObject:
   m_ObjectHideFlags: 0

@@ -105,6 +105,7 @@ GameObject:
   - component: {fileID: 8194959866741091178}
   - component: {fileID: 2306208392611436959}
   - component: {fileID: -6847276519860112062}
+  - component: {fileID: -8148575584527548056}
   m_Layer: 0
   m_Name: A_Life
   m_TagString: Untagged
@@ -238,7 +239,7 @@ MonoBehaviour:
   endScaleMultiplier: 0
   disableSpinWhileAttract: 1
   effects:
-  - {fileID: -6847276519860112062}
+  - {fileID: -8148575584527548056}
 --- !u!114 &-6847276519860112062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,3 +253,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogPickupEffect
   message: 'Got: +1 Life'
+--- !u!114 &-8148575584527548056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4522553219544185541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f981b9b830f78242a1117360493c038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrantItemPickupEffect
+  itemDefinition: {fileID: 11400000, guid: c5acee23c23844b46b918adf3a849ea1, type: 2}

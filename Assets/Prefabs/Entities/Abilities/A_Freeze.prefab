@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -3912176204733231451}
   - component: {fileID: 6705361256571223318}
   - component: {fileID: -3986802407024301847}
+  - component: {fileID: 4807416380197673388}
   m_Layer: 0
   m_Name: A_Freeze
   m_TagString: Untagged
@@ -148,7 +149,7 @@ MonoBehaviour:
   endScaleMultiplier: 0
   disableSpinWhileAttract: 1
   effects:
-  - {fileID: -3986802407024301847}
+  - {fileID: 4807416380197673388}
 --- !u!114 &-3986802407024301847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,6 +163,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogPickupEffect
   message: 'Got: Freeze Power'
+--- !u!114 &4807416380197673388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753624601172794624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f981b9b830f78242a1117360493c038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrantItemPickupEffect
+  itemDefinition: {fileID: 11400000, guid: 2000aa32eb0940b4398e38b6a8588cfe, type: 2}
 --- !u!1 &7873524156622120566
 GameObject:
   m_ObjectHideFlags: 0

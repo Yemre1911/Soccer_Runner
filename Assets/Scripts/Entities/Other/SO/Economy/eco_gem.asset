@@ -18,3 +18,12 @@ MonoBehaviour:
   weight: 1
   cooldownMeters: 150
   minSeparationMeters: 0
+  itemId: gem_eco
+  displayName: Gem
+  icon: {fileID: 0}
+  useType: 0
+  activationMode: 0
+  isDurationBased: 0
+  duration: 0
+  retriggerPolicy: 0
+  effectDefinition: {fileID: 0}

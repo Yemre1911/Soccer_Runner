@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: -4627013284242319288}
   - component: {fileID: -4025351278890047342}
   - component: {fileID: 7654577064633105991}
+  - component: {fileID: 899068102871935595}
   m_Layer: 0
   m_Name: coin_root
   m_TagString: Untagged
@@ -212,7 +213,7 @@ MonoBehaviour:
   endScaleMultiplier: 0
   disableSpinWhileAttract: 1
   effects:
-  - {fileID: -4025351278890047342}
+  - {fileID: 899068102871935595}
   - {fileID: 7654577064633105991}
 --- !u!114 &-4025351278890047342
 MonoBehaviour:
@@ -240,6 +241,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogPickupEffect
   message: 'Got: Coin'
+--- !u!114 &899068102871935595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902862477830993645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f981b9b830f78242a1117360493c038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrantItemPickupEffect
+  itemDefinition: {fileID: 11400000, guid: 7c9b7c73ad877a84bbd337e8048727a0, type: 2}
 --- !u!1 &4259482159338714020
 GameObject:
   m_ObjectHideFlags: 0

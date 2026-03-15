@@ -18,3 +18,12 @@ MonoBehaviour:
   weight: 1
   cooldownMeters: 250
   minSeparationMeters: 0
+  itemId: shockwave_ability
+  displayName: Shock Wave
+  icon: {fileID: 0}
+  useType: 2
+  activationMode: 1
+  isDurationBased: 0
+  duration: 0
+  retriggerPolicy: 2
+  effectDefinition: {fileID: 0}

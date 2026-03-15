@@ -105,6 +105,7 @@ GameObject:
   - component: {fileID: -6651628335983886205}
   - component: {fileID: 358489854441180692}
   - component: {fileID: 7830152352505174690}
+  - component: {fileID: -8467579420524312022}
   m_Layer: 0
   m_Name: A_Ball_Attack
   m_TagString: Untagged
@@ -238,7 +239,7 @@ MonoBehaviour:
   endScaleMultiplier: 0
   disableSpinWhileAttract: 1
   effects:
-  - {fileID: 7830152352505174690}
+  - {fileID: -8467579420524312022}
 --- !u!114 &7830152352505174690
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,3 +253,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogPickupEffect
   message: 'Got: Ball Attack'
+--- !u!114 &-8467579420524312022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6619103808764537062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f981b9b830f78242a1117360493c038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrantItemPickupEffect
+  itemDefinition: {fileID: 11400000, guid: f658eafd955b585408dae684c040e8a0, type: 2}

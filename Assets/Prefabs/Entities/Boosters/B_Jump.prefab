@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 999974857651390667}
   - component: {fileID: 254493201398222416}
   - component: {fileID: 9117863398620182002}
+  - component: {fileID: -6725427670782785270}
   m_Layer: 0
   m_Name: B_Jump
   m_TagString: Untagged
@@ -239,7 +240,7 @@ MonoBehaviour:
   endScaleMultiplier: 0
   disableSpinWhileAttract: 1
   effects:
-  - {fileID: 9117863398620182002}
+  - {fileID: -6725427670782785270}
 --- !u!114 &9117863398620182002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,3 +254,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogPickupEffect
   message: 'Got: Mega Jump'
+--- !u!114 &-6725427670782785270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6805449566437796781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f981b9b830f78242a1117360493c038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrantItemPickupEffect
+  itemDefinition: {fileID: 11400000, guid: 39144ce8907c3fc4d9dac9e0fa2ba2e1, type: 2}

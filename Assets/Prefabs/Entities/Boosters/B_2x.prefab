@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -2367469485753798382}
   - component: {fileID: 758935860399252460}
   - component: {fileID: -4729756926034305648}
+  - component: {fileID: -300263397276197203}
   m_Layer: 0
   m_Name: B_2x
   m_TagString: Untagged
@@ -148,7 +149,7 @@ MonoBehaviour:
   endScaleMultiplier: 0
   disableSpinWhileAttract: 1
   effects:
-  - {fileID: -4729756926034305648}
+  - {fileID: -300263397276197203}
 --- !u!114 &-4729756926034305648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,6 +163,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogPickupEffect
   message: 'Got: 2x Score'
+--- !u!114 &-300263397276197203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5373034516482290387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f981b9b830f78242a1117360493c038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrantItemPickupEffect
+  itemDefinition: {fileID: 11400000, guid: 3b9bac40751416a4598865e879ffcca6, type: 2}
 --- !u!1 &8556400967125632442
 GameObject:
   m_ObjectHideFlags: 0

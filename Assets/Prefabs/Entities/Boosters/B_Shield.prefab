@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -2947681049271626520}
   - component: {fileID: 1737580711747729937}
   - component: {fileID: 4686697709760955346}
+  - component: {fileID: 8921610188157883277}
   m_Layer: 0
   m_Name: B_Shield
   m_TagString: Untagged
@@ -148,7 +149,7 @@ MonoBehaviour:
   endScaleMultiplier: 0
   disableSpinWhileAttract: 1
   effects:
-  - {fileID: 4686697709760955346}
+  - {fileID: 8921610188157883277}
 --- !u!114 &4686697709760955346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,6 +163,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogPickupEffect
   message: 'Got: Shiled'
+--- !u!114 &8921610188157883277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5685975698790552274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f981b9b830f78242a1117360493c038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrantItemPickupEffect
+  itemDefinition: {fileID: 11400000, guid: 534efb44e472736489a132a0b9427b48, type: 2}
 --- !u!1 &7399708878409790675
 GameObject:
   m_ObjectHideFlags: 0
