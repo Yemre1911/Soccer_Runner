@@ -88,14 +88,14 @@ public class SessionDirector : MonoBehaviour
             breakDistance = Mathf.Max(1f, tuning.breakDistance);
 
             if (logPhaseChanges)
-                Debug.Log($"[SessionDirector] Tuning applied -> start={startingDistance}, wave={waveDistance}, break={breakDistance}");
+                //Debug.Log($"[SessionDirector] Tuning applied -> start={startingDistance}, wave={waveDistance}, break={breakDistance}");
 
             if (tuning.overrideLevelLength)
                 _config.levelLengthMeters = Mathf.Max(1f, tuning.levelLengthMeters);
         }
 
         if (!opponentSpawner)
-            Debug.LogWarning("[SessionDirector] OpponentSpawner not found in scene.");
+            //Debug.LogWarning("[SessionDirector] OpponentSpawner not found in scene.");
 
         if (GameManager.Instance != null)
             GameManager.Instance.ResetRunDistance();
@@ -150,7 +150,7 @@ public class SessionDirector : MonoBehaviour
         _phaseStartDistance = (GameManager.Instance != null) ? GameManager.Instance.RunDistance : 0f;
 
         if (logPhaseChanges)
-            Debug.Log($"[SessionDirector] Phase -> {phase} (startDistance={_phaseStartDistance:0.0})");
+            //Debug.Log($"[SessionDirector] Phase -> {phase} (startDistance={_phaseStartDistance:0.0})");
 
         if (opponentSpawner)
         {
@@ -182,7 +182,7 @@ public class SessionDirector : MonoBehaviour
         if (opponentSpawner)
             opponentSpawner.SetSpawningEnabled(false);
 
-        Debug.Log("[SessionDirector] Ending reached. (TODO: Goal shot sequence)");
+        //Debug.Log("[SessionDirector] Ending reached. (TODO: Goal shot sequence)");
     }
 
     private void HandleGameLost()
@@ -193,7 +193,7 @@ public class SessionDirector : MonoBehaviour
         if (opponentSpawner)
             opponentSpawner.SetSpawningEnabled(false);
 
-        Debug.Log("[SessionDirector] GameOver received -> session stopped.");
+        //Debug.Log("[SessionDirector] GameOver received -> session stopped.");
     }
 
     private IEnumerator SubscribeGameOverWhenReady()

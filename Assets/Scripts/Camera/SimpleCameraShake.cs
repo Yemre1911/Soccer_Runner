@@ -69,6 +69,6 @@ public class SimpleCameraShake : MonoBehaviour
     public void SetAmbientActive(bool active)
     {
         _ambientActive = active;
-        Debug.Log($"[SimpleCameraShake] SetAmbientActive({active}) on {name}");
+        //Debug.Log($"[SimpleCameraShake] SetAmbientActive({active}) on {name}");
     }
 }

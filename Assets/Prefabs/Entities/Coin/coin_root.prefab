@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 899068102871935595}
   m_Layer: 0
   m_Name: coin_root
-  m_TagString: Untagged
+  m_TagString: Coin
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -209,9 +209,10 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   targetOffset: {x: 0, y: 1, z: 0}
-  scaleDownDuration: 0.2
-  endScaleMultiplier: 0
+  scaleDownDuration: 0.8
+  endScaleMultiplier: 0.3
   disableSpinWhileAttract: 1
+  allowMagnetCollect: 1
   effects:
   - {fileID: 899068102871935595}
   - {fileID: 7654577064633105991}
@@ -265,7 +266,7 @@ GameObject:
   - component: {fileID: 4151044695345448494}
   - component: {fileID: 2221410792698784629}
   - component: {fileID: 5564150628143177402}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: coin_mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

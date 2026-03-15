@@ -26,4 +26,4 @@ MonoBehaviour:
   isDurationBased: 1
   duration: 10
   retriggerPolicy: 0
-  effectDefinition: {fileID: 0}
+  effectDefinition: {fileID: 11400000, guid: a5ab9fec6ea14a64388f47e288f11dc8, type: 2}

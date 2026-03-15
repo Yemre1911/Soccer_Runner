@@ -157,8 +157,35 @@ public class BoosterController : MonoBehaviour
 
     private IBoosterEffect CreateRuntimeEffect(ItemDefinitionSO itemDefinition)
     {
-        // Şimdilik effect bağlamıyoruz.
-        // Bir sonraki adımda effectDefinition'a göre gerçek runtime effect döndüreceğiz.
-        return null;
+        if (itemDefinition == null)
+            return new NullBoosterEffect();
+
+        if (itemDefinition.effectDefinition == null)
+        {
+            Debug.LogWarning($"[BoosterController] No effectDefinition on {itemDefinition.name}", this);
+            return new NullBoosterEffect();
+        }
+
+        switch (itemDefinition.effectDefinition)
+        {
+            case MagnetEffectDefinitionSO magnetDef:
+                return new MagnetBoosterEffect(magnetDef);
+
+            case JumpBoostEffectDefinitionSO jumpDef:
+                return new JumpBoosterEffect(jumpDef);
+
+            case ShieldEffectDefinitionSO shieldDef:
+                return new ShieldBoosterEffect(shieldDef);
+
+            case ScoreMultiplierEffectDefinitionSO scoreDef:
+                return new ScoreMultiplierBoosterEffect(scoreDef);
+
+            default:
+                Debug.LogWarning(
+                    $"[BoosterController] Unsupported effectDefinition type: {itemDefinition.effectDefinition.GetType().Name}",
+                    this
+                );
+                return new NullBoosterEffect();
+        }
     }
 }
