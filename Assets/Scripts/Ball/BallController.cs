@@ -12,7 +12,7 @@ public class BallController : MonoBehaviour
     private void Start()
     {
         SetupPhysics();
-        ChangeState(new DribbleState());
+        EnterDribble();
     }
 
     private void Update()
@@ -27,24 +27,34 @@ public class BallController : MonoBehaviour
         _currentState?.OnEnter(this);
     }
 
-    // --- PLAYER TARAFINDAN ÇAĞRILACAK METOTLAR ---
+    public void EnterIdle()
+    {
+        ChangeState(new BallIdleState());
+    }
+
+    public void EnterDribble()
+    {
+        ChangeState(new DribbleState());
+    }
+
+    public void SnapToSocketImmediate()
+    {
+        if (PlayerSocket == null) return;
+
+        transform.position = PlayerSocket.position;
+        transform.rotation = PlayerSocket.rotation;
+    }
 
     public void OnPlayerJump()
     {
-        // Eğer zaten havadaysak tekrar zıplama (Double jump yoksa)
         if (!(_currentState is BallJumpState))
-        {
             ChangeState(new BallJumpState());
-        }
     }
 
     public void OnPlayerQuickDrop()
     {
-        // Eğer havadaysak state'e haber ver
         if (_currentState is BallJumpState jumpState)
-        {
             jumpState.SetQuickDrop();
-        }
     }
 
     private void SetupPhysics()
@@ -57,11 +67,6 @@ public class BallController : MonoBehaviour
 
     public void ReleaseBall()
     {
-        ChangeState(null); // Update çalışmasını durdurur
-        //Rigidbody rb = GetComponent<Rigidbody>();
-        //rb.isKinematic = false;
-        //rb.useGravity = true;
-        //rb.velocity = new Vector3(0, 5f, 5f); // Hafif bir fırlama efekti
-        //transform.SetParent(null); // Karakterden kopar
+        ChangeState(null);
     }
 }

@@ -15,20 +15,18 @@ public class GameManager : MonoBehaviour, IGameSpeed, IRunDistance
     [Tooltip("Gerçek dünya hızı (BaseSpeed * multiplier) bu değeri geçmez.")]
     [SerializeField] private float _worldSpeedCap = 17f;
 
-    // Ham hız (zamanla artar)
     [SerializeField] private float _baseSpeed;
-
-    // Sprint çarpanı
     [SerializeField] private float _speedMultiplier = 1f;
 
-    // Mesafe takibi (distance-based spawn için)
     public float RunDistance { get; private set; }
 
     public float InitialSpeed => _initialSpeed;
     public float BaseSpeed => _baseSpeed;
     public float SpeedMultiplier => _speedMultiplier;
+    public bool SimulationPaused => _simulationPaused;
 
-    // Asıl dünya hızı (cap'li)
+    private bool _simulationPaused;
+
     public float CurrentSpeed
     {
         get
@@ -43,31 +41,40 @@ public class GameManager : MonoBehaviour, IGameSpeed, IRunDistance
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
 
-        _baseSpeed = _initialSpeed;
-        RunDistance = 0f;
+        ResetRuntimeState();
     }
 
     private void Update()
     {
-        // 1) Base speed zamanla artsın ama cap'i geçmesin
+        if (_simulationPaused)
+            return;
+
         _baseSpeed += _acceleration * Time.deltaTime;
         _baseSpeed = Mathf.Min(_baseSpeed, _baseSpeedCap);
 
-        // 2) Distance biriktir (cap'li CurrentSpeed ile)
         RunDistance += CurrentSpeed * Time.deltaTime;
     }
 
     public void SetSpeedMultiplier(float multiplier)
     {
         _speedMultiplier = Mathf.Max(0f, multiplier);
-        // CurrentSpeed zaten cap'li olduğu için burada ekstra clamp şart değil.
     }
 
-    /// <summary>
-    /// (Opsiyonel) Yeni level/run başlarken distance sıfırlamak için.
-    /// </summary>
+    public void SetSimulationPaused(bool paused)
+    {
+        _simulationPaused = paused;
+    }
+
     public void ResetRunDistance()
     {
+        RunDistance = 0f;
+    }
+
+    public void ResetRuntimeState()
+    {
+        _baseSpeed = _initialSpeed;
+        _speedMultiplier = 1f;
+        _simulationPaused = false;
         RunDistance = 0f;
     }
 

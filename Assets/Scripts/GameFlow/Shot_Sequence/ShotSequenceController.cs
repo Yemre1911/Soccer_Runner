@@ -17,8 +17,13 @@ public class ShotSequenceController : MonoBehaviour
     [SerializeField] private GameObject retryButtonRoot;
 
     [Header("Optional References")]
-    [SerializeField] private MonoBehaviour shotInputSystem; // sonra gerçek tipe çevrilir
-    [SerializeField] private MonoBehaviour playerShotModeController; // sonra gerçek tipe çevrilir
+    [SerializeField] private MonoBehaviour shotInputSystem;
+    [SerializeField] private MonoBehaviour playerShotModeController;
+    [SerializeField] private PlayerAnimationController playerAnimationController;
+
+    [Header("Slow Motion")]
+    [SerializeField] private bool useSlowMotionOnEnter = true;
+    [SerializeField] private float slowMotionScale = 0.15f;
 
     public ShotFlowState CurrentState { get; private set; } = ShotFlowState.Idle;
 
@@ -26,17 +31,27 @@ public class ShotSequenceController : MonoBehaviour
     public event Action<bool> OnShotResolved;
     public event Action OnRetryRequested;
 
+    private float _defaultFixedDeltaTime;
+
+    private void Awake()
+    {
+        _defaultFixedDeltaTime = Time.fixedDeltaTime;
+
+        if (!playerAnimationController)
+            playerAnimationController = FindFirstObjectByType<PlayerAnimationController>();
+    }
+
     public void EnterShotMode()
     {
         SetState(ShotFlowState.EnteringShotMode);
 
         if (retryButtonRoot) retryButtonRoot.SetActive(false);
 
-        // Burada ileride:
-        // - player'ı shot pose/state'e sokacağız
-        // - koşu sistemini yavaşlatacağız / sabitleyeceğiz
-        // - kamera değişecek
-        // - swipe input aktif olacak
+        if (playerAnimationController != null)
+            playerAnimationController.PlayShoot();
+
+        if (useSlowMotionOnEnter)
+            ApplySlowMotion();
 
         SetState(ShotFlowState.WaitingForShotInput);
         OnShotModeEntered?.Invoke();
@@ -52,9 +67,6 @@ public class ShotSequenceController : MonoBehaviour
 
         SetState(ShotFlowState.ResolvingShot);
 
-        // Burada ileride:
-        // top animasyonu, keeper reaction, gol / auta çıkma, sesler vs
-
         OnShotResolved?.Invoke(isGoal);
 
         SetState(ShotFlowState.ShowingResult);
@@ -68,12 +80,30 @@ public class ShotSequenceController : MonoBehaviour
 
     public void RetryTraining()
     {
+        RestoreTimeScale();
         OnRetryRequested?.Invoke();
         SessionBootstrap.ReloadLastConfig("GameScene");
+    }
+
+    public void RestoreTimeScale()
+    {
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = _defaultFixedDeltaTime;
+    }
+
+    private void ApplySlowMotion()
+    {
+        Time.timeScale = Mathf.Clamp(slowMotionScale, 0.01f, 1f);
+        Time.fixedDeltaTime = _defaultFixedDeltaTime * Time.timeScale;
     }
 
     private void SetState(ShotFlowState newState)
     {
         CurrentState = newState;
+    }
+
+    private void OnDisable()
+    {
+        RestoreTimeScale();
     }
 }

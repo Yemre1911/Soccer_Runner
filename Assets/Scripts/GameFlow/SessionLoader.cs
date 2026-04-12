@@ -98,12 +98,31 @@ public class SessionLoader : MonoBehaviour
 
     public void StartSession(SessionConfig config)
     {
+
         if (_started) return;
         _started = true;
+
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
 
         ActiveConfig = config;
 
         bool isShotTraining = config.mode == SessionMode.ShotTraining;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ResetRunDistance();
+
+            if (isShotTraining)
+            {
+                GameManager.Instance.SetSpeedMultiplier(0f);
+                GameManager.Instance.SetSimulationPaused(true);
+            }
+            else
+            {
+                GameManager.Instance.ResetRuntimeState();
+            }
+        }
 
         // 0) Tuning resolve
         SessionTuning tuning = null;

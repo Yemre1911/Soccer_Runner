@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinitionSO
   poolId: Coin
   category: 0
-  allowedPhases: 10
+  allowedPhases: 3
   weight: 1
   cooldownMeters: 150
   minSeparationMeters: 0

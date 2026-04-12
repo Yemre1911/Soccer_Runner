@@ -20,21 +20,16 @@ public class SessionDirector : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool logPhaseChanges = true;
 
-    [Header("Dynamic Wave-Break Calc. Related Variables")]
     public float StartingDistanceMeters => startingDistance;
     public float WaveDistanceMeters => waveDistance;
     public float BreakDistanceMeters => breakDistance;
 
     public Difficulty Difficulty => _config != null ? _config.difficulty : Difficulty.Easy;
 
-    // 1-based: 1,2,3...
     public int CurrentWaveIndex { get; private set; } = 0;
     public int TotalWaves { get; private set; } = 0;
 
-    public event Action<int, int> OnWaveStarted; // (waveIndex, totalWaves)
-
-    // --------------------------------------------------------------------------------------------------
-
+    public event Action<int, int> OnWaveStarted;
     public Phase CurrentPhase { get; private set; } = Phase.Idle;
     public event Action<Phase> OnPhaseChanged;
 
@@ -80,22 +75,15 @@ public class SessionDirector : MonoBehaviour
         if (_config.levelLengthMeters <= 0f)
             _config.levelLengthMeters = 1200f;
 
-        // Apply tuning (phase distances)
         if (tuning != null)
         {
             startingDistance = Mathf.Max(0f, tuning.startingDistance);
             waveDistance = Mathf.Max(1f, tuning.waveDistance);
             breakDistance = Mathf.Max(1f, tuning.breakDistance);
 
-            if (logPhaseChanges)
-                //Debug.Log($"[SessionDirector] Tuning applied -> start={startingDistance}, wave={waveDistance}, break={breakDistance}");
-
             if (tuning.overrideLevelLength)
                 _config.levelLengthMeters = Mathf.Max(1f, tuning.levelLengthMeters);
         }
-
-        if (!opponentSpawner)
-            //Debug.LogWarning("[SessionDirector] OpponentSpawner not found in scene.");
 
         if (GameManager.Instance != null)
             GameManager.Instance.ResetRunDistance();
@@ -106,10 +94,31 @@ public class SessionDirector : MonoBehaviour
         EnterPhase(Phase.Starting);
     }
 
+    public void BeginManual(SessionConfig config, Phase initialPhase = Phase.Idle)
+    {
+        _config = config;
+        _running = false;
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.ResetRunDistance();
+
+        CurrentWaveIndex = 0;
+        TotalWaves = 0;
+
+        EnterPhase(initialPhase);
+    }
+
+    public void SetManualPhase(Phase phase)
+    {
+        _running = false;
+        EnterPhase(phase);
+    }
+
     private void Update()
     {
         if (!_running) return;
         if (GameManager.Instance == null) return;
+        if (_config == null) return;
 
         float d = GameManager.Instance.RunDistance;
 
@@ -140,7 +149,6 @@ public class SessionDirector : MonoBehaviour
     {
         CurrentPhase = phase;
 
-        // Wave başladıysa wave index artır
         if (phase == Phase.Wave)
         {
             CurrentWaveIndex++;
@@ -149,13 +157,11 @@ public class SessionDirector : MonoBehaviour
 
         _phaseStartDistance = (GameManager.Instance != null) ? GameManager.Instance.RunDistance : 0f;
 
-        if (logPhaseChanges)
-            //Debug.Log($"[SessionDirector] Phase -> {phase} (startDistance={_phaseStartDistance:0.0})");
-
         if (opponentSpawner)
         {
             switch (phase)
             {
+                case Phase.Idle:
                 case Phase.Starting:
                 case Phase.Break:
                 case Phase.Ending:
@@ -181,8 +187,6 @@ public class SessionDirector : MonoBehaviour
 
         if (opponentSpawner)
             opponentSpawner.SetSpawningEnabled(false);
-
-        //Debug.Log("[SessionDirector] Ending reached. (TODO: Goal shot sequence)");
     }
 
     private void HandleGameLost()
@@ -192,8 +196,6 @@ public class SessionDirector : MonoBehaviour
 
         if (opponentSpawner)
             opponentSpawner.SetSpawningEnabled(false);
-
-        //Debug.Log("[SessionDirector] GameOver received -> session stopped.");
     }
 
     private IEnumerator SubscribeGameOverWhenReady()
@@ -213,16 +215,12 @@ public class SessionDirector : MonoBehaviour
         wave = Mathf.Max(0.01f, wave);
         brk = Mathf.Max(0.01f, brk);
 
-        // Starting sonrası kaç wave sığar? En sağlamı simülasyon.
         float d = 0f;
-
-        // Starting
         d += start;
 
         int waves = 0;
         bool inWave = true;
 
-        // LevelLength’e ulaşana kadar Wave/Break simüle et
         while (d < levelLength)
         {
             if (inWave)
@@ -237,7 +235,6 @@ public class SessionDirector : MonoBehaviour
                 inWave = true;
             }
 
-            // Güvenlik (çok ekstrem değerlerde infinite loop olmasın)
             if (waves > 9999) break;
         }
 
