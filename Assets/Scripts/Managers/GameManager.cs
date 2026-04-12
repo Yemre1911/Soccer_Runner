@@ -70,4 +70,10 @@ public class GameManager : MonoBehaviour, IGameSpeed, IRunDistance
     {
         RunDistance = 0f;
     }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
 }

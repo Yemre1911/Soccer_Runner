@@ -173,4 +173,10 @@ public class ItemPooler : MonoBehaviour
     {
         return _activeById.TryGetValue(id, out var list) ? list.Count : 0;
     }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
 }
