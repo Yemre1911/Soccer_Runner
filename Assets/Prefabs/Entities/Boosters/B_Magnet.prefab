@@ -148,6 +148,7 @@ MonoBehaviour:
   scaleDownDuration: 0.2
   endScaleMultiplier: 0
   disableSpinWhileAttract: 1
+  allowMagnetCollect: 0
   effects:
   - {fileID: 3384888402049026598}
 --- !u!114 &-1033447735053621456

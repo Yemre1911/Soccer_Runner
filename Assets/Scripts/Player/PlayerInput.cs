@@ -25,6 +25,7 @@ public class PlayerInput : MonoBehaviour
         _swipeDetector.OnLongPress += HandleSprint;
     }
 
+   
     private void Update()
     {
         // Klavye her zaman çalışmaya devam eder (Test için)
