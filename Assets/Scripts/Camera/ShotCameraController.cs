@@ -1,183 +1,389 @@
-using System.Collections;
+/*using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ShotCameraController : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private Transform cameraHolder;
-    [SerializeField] private Camera mainCamera;
-    [SerializeField] private CameraFollow cameraFollow;
-    [SerializeField] private CameraDynamicFOV cameraDynamicFOV;
-    [SerializeField] private CinematicEndCam cinematicEndCam;
+    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private Transform shotCameraAnchor;
 
-    [Header("Shot Blend")]
-    [SerializeField] private float blendDuration = 0.18f;
-    [SerializeField] private Vector3 shotHolderWorldOffset = new Vector3(0f, 0.15f, 0f);
-    [SerializeField] private Vector3 shotCameraLocalPosition = new Vector3(0f, 2.1f, -4.25f);
-    [SerializeField] private Vector3 shotCameraLocalEuler = new Vector3(10f, 0f, 0f);
+    [Header("Disable While Shot Camera Active")]
+    [SerializeField] private Behaviour[] componentsToDisable;
 
-    [Header("Look Target")]
-    [SerializeField] private float shotLookHeight = 1.15f;
-    [SerializeField] [Range(0f, 1f)] private float goalLookWeight = 0.55f;
+    [Header("Position")]
+    [SerializeField] private float backwardOffset = 8f;
+    [SerializeField] private float verticalOffset = 2.5f;
 
-    private Coroutine _blendRoutine;
+    [Header("Rotation")]
+    [SerializeField] private float pitch = 12f;
+    [SerializeField] private float yawOffset = 10f;
+    [SerializeField] private bool mirrorYawOffsetByShotSide = true;
+    [SerializeField] private float roll = 0f;
 
-    private bool _hasCachedState;
-    private Vector3 _cachedHolderPosition;
-    private Quaternion _cachedHolderRotation;
-    private Vector3 _cachedCameraLocalPosition;
-    private Quaternion _cachedCameraLocalRotation;
-    private bool _cachedFollowEnabled;
-    private bool _cachedFovEnabled;
-    private bool _cachedCinematicEnabled;
+    [Header("Move")]
+    [SerializeField] private float moveDuration = 1.5f;
+    [SerializeField] private AnimationCurve moveCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+    [Header("Animation Sync")]
+    [SerializeField, Range(0.01f, 1f)] private float shootTriggerProgress = 0.82f;
+
+    private readonly List<Behaviour> _disabledByShotCamera = new();
+    private Coroutine _moveRoutine;
+    private bool _shotCameraActive;
 
     private void Awake()
     {
-        AutoResolveReferences();
+        if (!cameraTransform)
+            cameraTransform = transform;
     }
 
-    public void EnterShotView(Transform playerTransform, Transform goalTransform)
+    public void SetAnchor(Transform newAnchor)
     {
-        AutoResolveReferences();
+        shotCameraAnchor = newAnchor;
+    }
 
-        if (cameraHolder == null || mainCamera == null || playerTransform == null)
+    public void StopActiveMove()
+    {
+        if (_moveRoutine != null)
         {
-            Debug.LogWarning("[ShotCameraController] Missing required references.");
+            StopCoroutine(_moveRoutine);
+            _moveRoutine = null;
+        }
+    }
+
+    public IEnumerator MoveToShotViewUntilShootPoint(Transform playerTransform)
+    {
+        if (cameraTransform == null || playerTransform == null || shotCameraAnchor == null)
+            yield break;
+
+        ActivateShotCamera();
+
+        StopActiveMove();
+        _moveRoutine = StartCoroutine(MoveRoutine(playerTransform));
+        yield return _moveRoutine;
+        _moveRoutine = null;
+    }
+
+    public void SnapToShotView(Transform playerTransform)
+    {
+        if (cameraTransform == null || playerTransform == null || shotCameraAnchor == null)
             return;
-        }
 
-        if (_blendRoutine != null)
-            StopCoroutine(_blendRoutine);
+        ActivateShotCamera();
 
-        _blendRoutine = StartCoroutine(BlendToShotView(playerTransform, goalTransform));
+        cameraTransform.position = GetTargetPosition(playerTransform);
+        cameraTransform.rotation = GetTargetRotation(playerTransform);
     }
 
-    public void ExitShotView()
+    public void ActivateShotCamera()
     {
-        if (_blendRoutine != null)
-        {
-            StopCoroutine(_blendRoutine);
-            _blendRoutine = null;
-        }
+        if (_shotCameraActive)
+            return;
 
-        RestoreCachedState();
+        _shotCameraActive = true;
+        DisableExternalCameraComponents();
     }
 
-    private IEnumerator BlendToShotView(Transform playerTransform, Transform goalTransform)
+    public void DeactivateShotCamera()
     {
-        CacheCurrentState();
-        DisableNormalCameraControllers();
+        if (!_shotCameraActive)
+            return;
 
-        Vector3 startHolderPos = cameraHolder.position;
-        Quaternion startHolderRot = cameraHolder.rotation;
-        Vector3 startCamLocalPos = mainCamera.transform.localPosition;
-        Quaternion startCamLocalRot = mainCamera.transform.localRotation;
+        _shotCameraActive = false;
+        ReEnableExternalCameraComponents();
+    }
 
-        Vector3 targetHolderPos = playerTransform.position + shotHolderWorldOffset;
-        Vector3 lookTarget = GetLookTarget(playerTransform, goalTransform);
-        Quaternion targetHolderRot = Quaternion.LookRotation(lookTarget - targetHolderPos, Vector3.up);
+    private IEnumerator MoveRoutine(Transform playerTransform)
+    {
+        Vector3 startPos = cameraTransform.position;
+        Quaternion startRot = cameraTransform.rotation;
 
-        Vector3 targetCamLocalPos = shotCameraLocalPosition;
-        Quaternion targetCamLocalRot = Quaternion.Euler(shotCameraLocalEuler);
+        Vector3 targetPos = GetTargetPosition(playerTransform);
+        Quaternion targetRot = GetTargetRotation(playerTransform);
 
-        float duration = Mathf.Max(0.01f, blendDuration);
+        float duration = Mathf.Max(0.01f, moveDuration);
         float elapsed = 0f;
 
         while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            t = Mathf.SmoothStep(0f, 1f, t);
 
-            cameraHolder.position = Vector3.Lerp(startHolderPos, targetHolderPos, t);
-            cameraHolder.rotation = Quaternion.Slerp(startHolderRot, targetHolderRot, t);
+            float rawT = Mathf.Clamp01(elapsed / duration);
+            float curvedT = moveCurve.Evaluate(rawT);
 
-            mainCamera.transform.localPosition = Vector3.Lerp(startCamLocalPos, targetCamLocalPos, t);
-            mainCamera.transform.localRotation = Quaternion.Slerp(startCamLocalRot, targetCamLocalRot, t);
+            cameraTransform.position = Vector3.Lerp(startPos, targetPos, curvedT);
+            cameraTransform.rotation = Quaternion.Slerp(startRot, targetRot, curvedT);
+
+            if (rawT >= shootTriggerProgress)
+                yield break;
 
             yield return null;
         }
 
-        cameraHolder.position = targetHolderPos;
-        cameraHolder.rotation = targetHolderRot;
-        mainCamera.transform.localPosition = targetCamLocalPos;
-        mainCamera.transform.localRotation = targetCamLocalRot;
-
-        _blendRoutine = null;
+        cameraTransform.position = targetPos;
+        cameraTransform.rotation = targetRot;
     }
 
-    private Vector3 GetLookTarget(Transform playerTransform, Transform goalTransform)
+    private Vector3 GetTargetPosition(Transform playerTransform)
     {
-        Vector3 playerPoint = playerTransform.position + Vector3.up * shotLookHeight;
+        Vector3 anchorWorldPos = shotCameraAnchor.position;
 
-        if (goalTransform == null)
-            return playerPoint + playerTransform.forward * 8f;
-
-        Vector3 goalPoint = goalTransform.position + Vector3.up * shotLookHeight;
-        return Vector3.Lerp(playerPoint, goalPoint, goalLookWeight);
+        return anchorWorldPos
+             - playerTransform.forward * backwardOffset
+             + Vector3.up * verticalOffset;
     }
 
-    private void AutoResolveReferences()
+    private Quaternion GetTargetRotation(Transform playerTransform)
     {
-        if (mainCamera == null)
-            mainCamera = Camera.main;
+        float finalYawOffset = yawOffset;
 
-        if (mainCamera != null && cameraHolder == null)
-            cameraHolder = mainCamera.transform.parent;
+        if (mirrorYawOffsetByShotSide)
+        {
+            // Oyuncu soldaysa +offset, sağdaysa -offset
+            finalYawOffset *= playerTransform.position.x < 0f ? 1f : -1f;
+        }
 
-        if (mainCamera != null && cameraFollow == null)
-            cameraFollow = mainCamera.GetComponent<CameraFollow>();
-
-        if (mainCamera != null && cameraDynamicFOV == null)
-            cameraDynamicFOV = mainCamera.GetComponent<CameraDynamicFOV>();
-
-        if (mainCamera != null && cinematicEndCam == null)
-            cinematicEndCam = mainCamera.GetComponent<CinematicEndCam>();
+        float yaw = playerTransform.eulerAngles.y + finalYawOffset;
+        return Quaternion.Euler(pitch, yaw, roll);
     }
 
-    private void CacheCurrentState()
+    private void DisableExternalCameraComponents()
     {
-        if (_hasCachedState || cameraHolder == null || mainCamera == null)
+        _disabledByShotCamera.Clear();
+
+        if (componentsToDisable == null)
             return;
 
-        _cachedHolderPosition = cameraHolder.position;
-        _cachedHolderRotation = cameraHolder.rotation;
-        _cachedCameraLocalPosition = mainCamera.transform.localPosition;
-        _cachedCameraLocalRotation = mainCamera.transform.localRotation;
+        for (int i = 0; i < componentsToDisable.Length; i++)
+        {
+            Behaviour component = componentsToDisable[i];
 
-        _cachedFollowEnabled = cameraFollow != null && cameraFollow.enabled;
-        _cachedFovEnabled = cameraDynamicFOV != null && cameraDynamicFOV.enabled;
-        _cachedCinematicEnabled = cinematicEndCam != null && cinematicEndCam.enabled;
+            if (component == null)
+                continue;
 
-        _hasCachedState = true;
+            if (!component.enabled)
+                continue;
+
+            component.enabled = false;
+            _disabledByShotCamera.Add(component);
+        }
     }
 
-    private void DisableNormalCameraControllers()
+    private void ReEnableExternalCameraComponents()
     {
-        if (cameraFollow != null) cameraFollow.enabled = false;
-        if (cameraDynamicFOV != null) cameraDynamicFOV.enabled = false;
-        if (cinematicEndCam != null) cinematicEndCam.enabled = false;
-    }
+        for (int i = 0; i < _disabledByShotCamera.Count; i++)
+        {
+            Behaviour component = _disabledByShotCamera[i];
 
-    private void RestoreCachedState()
-    {
-        if (!_hasCachedState || cameraHolder == null || mainCamera == null)
-            return;
+            if (component != null)
+                component.enabled = true;
+        }
 
-        cameraHolder.position = _cachedHolderPosition;
-        cameraHolder.rotation = _cachedHolderRotation;
-        mainCamera.transform.localPosition = _cachedCameraLocalPosition;
-        mainCamera.transform.localRotation = _cachedCameraLocalRotation;
-
-        if (cameraFollow != null) cameraFollow.enabled = _cachedFollowEnabled;
-        if (cameraDynamicFOV != null) cameraDynamicFOV.enabled = _cachedFovEnabled;
-        if (cinematicEndCam != null) cinematicEndCam.enabled = _cachedCinematicEnabled;
-
-        _hasCachedState = false;
+        _disabledByShotCamera.Clear();
     }
 
     private void OnDisable()
     {
-        ExitShotView();
+        StopActiveMove();
+        ReEnableExternalCameraComponents();
+        _shotCameraActive = false;
+    }
+}*/
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ShotCameraController : MonoBehaviour
+{
+    [Header("References")]
+    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private Transform shotCameraAnchor;
+
+    [Header("Disable While Shot Camera Active")]
+    [SerializeField] private Behaviour[] componentsToDisable;
+
+    [Header("Position")]
+    [SerializeField] private float backwardOffset = 8f;
+    [SerializeField] private float verticalOffset = 2.5f;
+
+    [Header("Rotation")]
+    [SerializeField] private float pitch = 12f;
+    [SerializeField] private float yawOffset = 10f;
+    [SerializeField] private bool mirrorYawOffsetByShotSide = true;
+    [SerializeField] private float centerDeadZoneX = 3.5f;
+    [SerializeField] private float roll = 0f;
+
+    [Header("Move")]
+    [SerializeField] private float moveDuration = 1.5f;
+    [SerializeField] private AnimationCurve moveCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+    [Header("Animation Sync")]
+    [SerializeField, Range(0.01f, 1f)] private float shootTriggerProgress = 0.82f;
+
+    private readonly List<Behaviour> _disabledByShotCamera = new();
+    private Coroutine _moveRoutine;
+    private bool _shotCameraActive;
+
+    private void Awake()
+    {
+        if (!cameraTransform)
+            cameraTransform = transform;
+    }
+
+    public void SetAnchor(Transform newAnchor)
+    {
+        shotCameraAnchor = newAnchor;
+    }
+
+    public void StopActiveMove()
+    {
+        if (_moveRoutine != null)
+        {
+            StopCoroutine(_moveRoutine);
+            _moveRoutine = null;
+        }
+    }
+
+    public IEnumerator MoveToShotViewUntilShootPoint(Transform playerTransform)
+    {
+        if (cameraTransform == null || playerTransform == null || shotCameraAnchor == null)
+            yield break;
+
+        ActivateShotCamera();
+
+        StopActiveMove();
+        _moveRoutine = StartCoroutine(MoveRoutine(playerTransform));
+        yield return _moveRoutine;
+        _moveRoutine = null;
+    }
+
+    public void SnapToShotView(Transform playerTransform)
+    {
+        if (cameraTransform == null || playerTransform == null || shotCameraAnchor == null)
+            return;
+
+        ActivateShotCamera();
+
+        cameraTransform.position = GetTargetPosition(playerTransform);
+        cameraTransform.rotation = GetTargetRotation(playerTransform);
+    }
+
+    public void ActivateShotCamera()
+    {
+        if (_shotCameraActive)
+            return;
+
+        _shotCameraActive = true;
+        DisableExternalCameraComponents();
+    }
+
+    public void DeactivateShotCamera()
+    {
+        if (!_shotCameraActive)
+            return;
+
+        _shotCameraActive = false;
+        ReEnableExternalCameraComponents();
+    }
+
+    private IEnumerator MoveRoutine(Transform playerTransform)
+    {
+        Vector3 startPos = cameraTransform.position;
+        Quaternion startRot = cameraTransform.rotation;
+
+        Vector3 targetPos = GetTargetPosition(playerTransform);
+        Quaternion targetRot = GetTargetRotation(playerTransform);
+
+        float duration = Mathf.Max(0.01f, moveDuration);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+
+            float rawT = Mathf.Clamp01(elapsed / duration);
+            float curvedT = moveCurve.Evaluate(rawT);
+
+            cameraTransform.position = Vector3.Lerp(startPos, targetPos, curvedT);
+            cameraTransform.rotation = Quaternion.Slerp(startRot, targetRot, curvedT);
+
+            if (rawT >= shootTriggerProgress)
+                yield break;
+
+            yield return null;
+        }
+
+        cameraTransform.position = targetPos;
+        cameraTransform.rotation = targetRot;
+    }
+
+    private Vector3 GetTargetPosition(Transform playerTransform)
+    {
+        Vector3 anchorWorldPos = shotCameraAnchor.position;
+
+        return anchorWorldPos
+             - playerTransform.forward * backwardOffset
+             + Vector3.up * verticalOffset;
+    }
+
+    private Quaternion GetTargetRotation(Transform playerTransform)
+    {
+        float playerX = playerTransform.position.x;
+        float finalYawOffset = 0f;
+
+        if (Mathf.Abs(playerX) > centerDeadZoneX)
+        {
+            finalYawOffset = yawOffset;
+
+            if (mirrorYawOffsetByShotSide)
+                finalYawOffset *= playerX < 0f ? 1f : -1f;
+        }
+
+        float yaw = playerTransform.eulerAngles.y + finalYawOffset;
+        return Quaternion.Euler(pitch, yaw, roll);
+    }
+
+    private void DisableExternalCameraComponents()
+    {
+        _disabledByShotCamera.Clear();
+
+        if (componentsToDisable == null)
+            return;
+
+        for (int i = 0; i < componentsToDisable.Length; i++)
+        {
+            Behaviour component = componentsToDisable[i];
+
+            if (component == null)
+                continue;
+
+            if (!component.enabled)
+                continue;
+
+            component.enabled = false;
+            _disabledByShotCamera.Add(component);
+        }
+    }
+
+    private void ReEnableExternalCameraComponents()
+    {
+        for (int i = 0; i < _disabledByShotCamera.Count; i++)
+        {
+            Behaviour component = _disabledByShotCamera[i];
+
+            if (component != null)
+                component.enabled = true;
+        }
+
+        _disabledByShotCamera.Clear();
+    }
+
+    private void OnDisable()
+    {
+        StopActiveMove();
+        ReEnableExternalCameraComponents();
+        _shotCameraActive = false;
     }
 }

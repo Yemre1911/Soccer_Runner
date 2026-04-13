@@ -8247,7 +8247,7 @@ MonoBehaviour:
   ballController: {fileID: 878252872}
   playerAnimationController: {fileID: 284140432}
   playerShotAlignController: {fileID: 1781460038}
-  playerLateralMovement: {fileID: 0}
+  playerLateralMovement: {fileID: 1781460024}
   shotInputSystem: {fileID: 0}
   playerShotModeController: {fileID: 0}
   useSlowMotionOnEnter: 1
@@ -8256,6 +8256,8 @@ MonoBehaviour:
   snapBallToSocketOnEnter: 1
   stopBallDribbleOnEnter: 1
   stopRunningAnimationOnEnter: 1
+  shotCameraController: {fileID: 917066094}
+  shotCameraAnchor: {fileID: 2010645211}
 --- !u!114 &832207275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8279,7 +8281,7 @@ MonoBehaviour:
   goalCandidates:
   - {fileID: 309782650}
   - {fileID: 1076566212}
-  shootingTriggerDistance: 40
+  shootingTriggerDistance: 48
   defaultFogDistance: 87
   shotFogDistance: 117
   normalEndingFogSmoothSpeed: 90
@@ -9419,17 +9421,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b7b437cf623d5243ae1b19c131825f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShotCameraController
-  cameraHolder: {fileID: 1780024329}
-  mainCamera: {fileID: 917066089}
-  cameraFollow: {fileID: 917066091}
-  cameraDynamicFOV: {fileID: 917066092}
-  cinematicEndCam: {fileID: 917066093}
-  blendDuration: 1
-  shotHolderWorldOffset: {x: 2, y: 8, z: -6}
-  shotCameraLocalPosition: {x: 2.5, y: 8, z: -4.25}
-  shotCameraLocalEuler: {x: 23, y: 0, z: 0}
-  shotLookHeight: 3
-  goalLookWeight: 0.55
+  cameraTransform: {fileID: 917066090}
+  shotCameraAnchor: {fileID: 2010645211}
+  componentsToDisable:
+  - {fileID: 917066091}
+  - {fileID: 917066092}
+  - {fileID: 917066093}
+  backwardOffset: 8
+  verticalOffset: 2.5
+  pitch: 12
+  yawOffset: 6
+  roll: 0
+  moveDuration: 1.5
+  moveCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.27000046
+      value: -0.10845947
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1.1466672
+      value: 0.4272138
+      inSlope: -1.9375254
+      outSlope: -1.9375254
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.07764735
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  shootTriggerProgress: 0.5
 --- !u!1 &939261679
 GameObject:
   m_ObjectHideFlags: 0
@@ -19384,7 +19412,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 05d18406b8cb2dd49830f2bcbc9b40e4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -12,58 +12,6 @@ public class PlayerShotAlignController : MonoBehaviour
     [SerializeField] private string goalAimPointName = "ShotAimPoint";
     [SerializeField] private bool logAlignment = true;
 
-    /*public IEnumerator AlignToGoal(Transform playerRoot, Transform goalTransform)
-    {
-        if (playerRoot == null || goalTransform == null)
-            yield break;
-
-        Transform aimTarget = ResolveAimTarget(goalTransform);
-
-        Vector3 targetPos = aimTarget.position;
-        Vector3 playerPos = playerRoot.position;
-
-        Vector3 toGoal = targetPos - playerPos;
-        toGoal.y = 0f;
-
-        if (logAlignment)
-        {
-            float angleDebug = Vector3.SignedAngle(playerRoot.forward, toGoal.normalized, Vector3.up);
-            Debug.Log(
-                $"[PlayerShotAlign] Player={playerPos} Target={targetPos} FlatDir={toGoal} SignedAngle={angleDebug:F2} TargetName={aimTarget.name}");
-        }
-
-        if (toGoal.sqrMagnitude < 0.0001f)
-            yield break;
-
-        Quaternion targetRotation = Quaternion.LookRotation(toGoal.normalized, Vector3.up);
-
-        if (!useSmoothRotation)
-        {
-            playerRoot.rotation = targetRotation;
-            yield break;
-        }
-
-        Quaternion startRotation = playerRoot.rotation;
-        float elapsed = 0f;
-        float duration = Mathf.Max(0.01f, rotateDuration);
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            t = Mathf.SmoothStep(0f, 1f, t);
-
-            playerRoot.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
-
-            float angle = Quaternion.Angle(playerRoot.rotation, targetRotation);
-            if (angle <= finishAngleTolerance)
-                break;
-
-            yield return null;
-        }
-
-        playerRoot.rotation = targetRotation;
-    }*/
 
     public IEnumerator AlignToGoal(Transform playerRoot, Transform goalTransform)
     {
