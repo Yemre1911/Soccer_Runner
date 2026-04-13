@@ -15,6 +15,9 @@ public class ShotApproachFlowController : MonoBehaviour
     [SerializeField] private Transform goalTransform;
     [SerializeField] private Transform playerTransform;
 
+    [Tooltip("Sahnede birden fazla kale/final block varsa hepsini buraya ver. Script aktif olanı otomatik seçer.")]
+    [SerializeField] private Transform[] goalCandidates;
+
     [Header("Distances")]
     [SerializeField] private float shootingTriggerDistance = 18f;
 
@@ -26,12 +29,17 @@ public class ShotApproachFlowController : MonoBehaviour
     [Header("Training Input Guard")]
     [SerializeField] private float trainingInputArmDelay = 0.35f;
 
+    [Header("Goal Resolve")]
+    [SerializeField] private bool logGoalResolve = true;
+    [SerializeField] private float endingGoalResolveTimeout = 3f;
+
     private SessionConfig _config;
     private bool _trainingWaitingForInput;
     private bool _approachActive;
     private bool _shotStarted;
     private bool _initialized;
     private Coroutine _armInputRoutine;
+    private Coroutine _waitForGoalRoutine;
 
     private void Awake()
     {
@@ -48,6 +56,8 @@ public class ShotApproachFlowController : MonoBehaviour
             if (playerObj != null)
                 playerTransform = playerObj.transform;
         }
+
+        ResolveGoalTransform(false);
     }
 
     private void OnEnable()
@@ -72,6 +82,12 @@ public class ShotApproachFlowController : MonoBehaviour
             StopCoroutine(_armInputRoutine);
             _armInputRoutine = null;
         }
+
+        if (_waitForGoalRoutine != null)
+        {
+            StopCoroutine(_waitForGoalRoutine);
+            _waitForGoalRoutine = null;
+        }
     }
 
     private IEnumerator Start()
@@ -88,7 +104,12 @@ public class ShotApproachFlowController : MonoBehaviour
             return;
 
         if (_approachActive && !_shotStarted)
+        {
+            if (!IsGoalUsable(goalTransform))
+                ResolveGoalTransform(false);
+
             CheckShootingDistance();
+        }
     }
 
     private void InitializeForMode()
@@ -97,6 +118,8 @@ public class ShotApproachFlowController : MonoBehaviour
         _shotStarted = false;
         _approachActive = false;
         _trainingWaitingForInput = false;
+
+        ResolveGoalTransform(true);
 
         if (_config.mode == SessionMode.ShotTraining)
             SetupTrainingMode();
@@ -127,6 +150,8 @@ public class ShotApproachFlowController : MonoBehaviour
         if (ballController != null)
             ballController.EnterIdle();
 
+        ResolveGoalTransform(true);
+
         _approachActive = false;
         _shotStarted = false;
         _trainingWaitingForInput = false;
@@ -149,6 +174,8 @@ public class ShotApproachFlowController : MonoBehaviour
 
         if (ballController != null)
             ballController.EnterDribble();
+
+        ResolveGoalTransform(true);
 
         _approachActive = false;
         _shotStarted = false;
@@ -176,15 +203,12 @@ public class ShotApproachFlowController : MonoBehaviour
 
         float startRealtime = Time.realtimeSinceStartup;
 
-        // İlk olarak sahneye taşınmış mouse/touch basılı durumunu tamamen bekle
         while (Input.GetMouseButton(0) || Input.touchCount > 0)
             yield return null;
 
-        // Sonra küçük bir güvenlik gecikmesi
         while (Time.realtimeSinceStartup - startRealtime < trainingInputArmDelay)
             yield return null;
 
-        // Eğer delay sonunda tekrar basılıysa yine bekle
         while (Input.GetMouseButton(0) || Input.touchCount > 0)
             yield return null;
 
@@ -200,8 +224,6 @@ public class ShotApproachFlowController : MonoBehaviour
 
         if (GameManager.Instance != null)
         {
-            // Training'de run başlatırken runtime’ı sıfırdan normal moda çekmek istemiyoruz.
-            // Sadece pause kaldırıp akışı başlatıyoruz.
             GameManager.Instance.ResetRunDistance();
             GameManager.Instance.SetSimulationPaused(false);
             GameManager.Instance.SetSpeedMultiplier(1f);
@@ -215,6 +237,8 @@ public class ShotApproachFlowController : MonoBehaviour
 
         if (sessionDirector != null)
             sessionDirector.SetManualPhase(SessionDirector.Phase.Ending);
+
+        ResolveGoalTransform(true);
 
         _approachActive = true;
 
@@ -233,20 +257,62 @@ public class ShotApproachFlowController : MonoBehaviour
             if (fogDistanceController != null)
                 fogDistanceController.SmoothTo(shotFogDistance, normalEndingFogSmoothSpeed);
 
-            _approachActive = true;
             _shotStarted = false;
+            _approachActive = false;
 
-            Debug.Log("[ShotApproach] Normal mode ending detected. Shot approach active.");
+            if (_waitForGoalRoutine != null)
+                StopCoroutine(_waitForGoalRoutine);
+
+            _waitForGoalRoutine = StartCoroutine(WaitForUsableGoalThenActivateApproach());
+
+            Debug.Log("[ShotApproach] Normal mode ending detected. Waiting for active goal...");
         }
+    }
+
+    private IEnumerator WaitForUsableGoalThenActivateApproach()
+    {
+        float elapsed = 0f;
+
+        while (elapsed < endingGoalResolveTimeout)
+        {
+            ResolveGoalTransform(false);
+
+            if (IsGoalUsable(goalTransform))
+            {
+                _approachActive = true;
+                _waitForGoalRoutine = null;
+
+                Debug.Log("[ShotApproach] Active goal found. Shot approach active. Goal = " + goalTransform.name);
+                yield break;
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        _waitForGoalRoutine = null;
+
+        Debug.LogWarning("[ShotApproach] Could not find an active goal in time. Approach not activated.");
     }
 
     private void CheckShootingDistance()
     {
-        if (goalTransform == null || playerTransform == null)
+        if (!IsGoalUsable(goalTransform))
             return;
 
-        // Runner mantığında en güvenlisi Z farkı
+        if (playerTransform == null)
+        {
+            Debug.LogWarning("[ShotApproach] playerTransform is NULL.");
+            return;
+        }
+
         float dz = Mathf.Abs(playerTransform.position.z - goalTransform.position.z);
+
+        if (logGoalResolve)
+        {
+            Debug.Log(
+                $"[ShotApproach] Checking distance | Player={playerTransform.position.z:F2} Goal={goalTransform.position.z:F2} dz={dz:F2}");
+        }
 
         if (dz <= shootingTriggerDistance)
         {
@@ -270,6 +336,60 @@ public class ShotApproachFlowController : MonoBehaviour
 
         if (shotSequenceController != null)
             shotSequenceController.EnterShotMode();
+    }
+
+    private bool ResolveGoalTransform(bool forceLog)
+    {
+        if (IsGoalUsable(goalTransform))
+        {
+            if (forceLog || logGoalResolve)
+                Debug.Log("[ShotApproach] Goal already usable: " + goalTransform.name);
+
+            return true;
+        }
+
+        if (goalCandidates != null)
+        {
+            for (int i = 0; i < goalCandidates.Length; i++)
+            {
+                Transform candidate = goalCandidates[i];
+                if (!IsGoalUsable(candidate))
+                    continue;
+
+                goalTransform = candidate;
+
+                if (forceLog || logGoalResolve)
+                    Debug.Log("[ShotApproach] Goal resolved from candidates: " + goalTransform.name);
+
+                return true;
+            }
+        }
+
+        if (forceLog || logGoalResolve)
+            Debug.LogWarning("[ShotApproach] No usable active goal found.");
+
+        return false;
+    }
+
+    private bool IsGoalUsable(Transform target)
+    {
+        if (target == null)
+            return false;
+
+        if (!target.gameObject.activeInHierarchy)
+            return false;
+
+        return true;
+    }
+
+    public void SetGoalTransform(Transform newGoal)
+    {
+        goalTransform = newGoal;
+
+        if (newGoal != null)
+            Debug.Log("[ShotApproach] Goal transform assigned externally: " + newGoal.name);
+        else
+            Debug.LogWarning("[ShotApproach] Goal transform assigned externally as NULL.");
     }
 }*/
 
@@ -610,7 +730,7 @@ public class ShotApproachFlowController : MonoBehaviour
             GameManager.Instance.SetSimulationPaused(true);
 
         if (shotSequenceController != null)
-            shotSequenceController.EnterShotMode();
+            shotSequenceController.EnterShotMode(playerTransform, goalTransform);
     }
 
     private bool ResolveGoalTransform(bool forceLog)
