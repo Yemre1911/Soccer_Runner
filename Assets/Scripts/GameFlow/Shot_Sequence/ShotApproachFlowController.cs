@@ -331,9 +331,6 @@ public class ShotApproachFlowController : MonoBehaviour
 
         Debug.Log("[ShotApproach] BeginShooting");
 
-        if (GameManager.Instance != null)
-            GameManager.Instance.SetSimulationPaused(true);
-
         if (shotSequenceController != null)
             shotSequenceController.EnterShotMode(playerTransform, goalTransform);
     }
