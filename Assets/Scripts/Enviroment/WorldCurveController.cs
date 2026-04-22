@@ -6,31 +6,31 @@ public class WorldCurveController : MonoBehaviour
     [SerializeField] private Transform _playerTransform;
 
     [Header("Curve Ayarları")]
-    public float _maxCurveAmount = 0.0005f;
+    public float _maxSideCurveAmount = 0.0005f;
     [SerializeField] private float _maxPlayerX = 3f;
 
-    // Shader Graph'taki referansın ID karşılığı
-    private int _curvePropertyID;
+    [Header("Backward Curve")]
+    [SerializeField] private float _defaultBackwardCurve = -0.002f;
+
+    private int _sideCurvePropertyID;
+    private int _backwardCurvePropertyID;
 
     private void Start()
     {
-        // GÖRSELDEN ALDIĞIMIZ REFERANS (Yazım hatası dahil birebir aynı olmalı)
-        // Shader Graph Inspector'da yazan: _SideWayStrenght
-        _curvePropertyID = Shader.PropertyToID("_SideWayStrenght");
+        _sideCurvePropertyID = Shader.PropertyToID("_SideWayStrenght");
+        _backwardCurvePropertyID = Shader.PropertyToID("_BackWardsStrenght");
+
+        // Başlangıçta backward curve'ü garanti set et
+        Shader.SetGlobalFloat(_backwardCurvePropertyID, _defaultBackwardCurve);
     }
 
     private void LateUpdate()
     {
         if (_playerTransform == null) return;
 
-        // MATEMATİK:
-        // Karakter sağa (+X) giderse, yol sola (-Curve) bükülmeli.
         float ratio = -_playerTransform.position.x / _maxPlayerX;
-        float currentCurve = ratio * _maxCurveAmount;
+        float currentSideCurve = ratio * _maxSideCurveAmount;
 
-        // Debug.Log($"Curve Değeri: {currentCurve}"); // Çalışmıyorsa bu satırı açıp konsola bakabilirsin.
-
-        // GLOBAL DEĞİŞKENİ GÜNCELLE:
-        Shader.SetGlobalFloat(_curvePropertyID, currentCurve);
+        Shader.SetGlobalFloat(_sideCurvePropertyID, currentSideCurve);
     }
 }

@@ -6,6 +6,10 @@ TagManager:
   tags:
   - FxTemporaire
   - Coin
+  - ShotKeeperFront
+  - ShotKeeperWide
+  - ShotGround
+  - ShotGoalArea
   layers:
   - Default
   - TransparentFX
@@ -17,10 +21,10 @@ TagManager:
   - OpponentHit
   - HazardHit
   - CoinLayer
-  - 
-  - 
-  - 
-  - 
+  - ShotTarget
+  - ShotKeeperFront
+  - ShotKeeperWide
+  - ShotGround
   - 
   - 
   - 

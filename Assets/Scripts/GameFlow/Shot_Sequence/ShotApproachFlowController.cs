@@ -26,6 +26,8 @@ public class ShotApproachFlowController : MonoBehaviour
     [SerializeField] private float shotFogDistance = 117f;
     [SerializeField] private float normalEndingFogSmoothSpeed = 90f;
 
+    [SerializeField] private CurveChangeController curveChangeController;
+
     [Header("Training Input Guard")]
     [SerializeField] private float trainingInputArmDelay = 0.35f;
 
@@ -49,6 +51,7 @@ public class ShotApproachFlowController : MonoBehaviour
         if (!fogDistanceController) fogDistanceController = FindFirstObjectByType<FogDistanceController>();
         if (!playerInput) playerInput = FindFirstObjectByType<PlayerInput>();
         if (!ballController) ballController = FindFirstObjectByType<BallController>();
+        if (!curveChangeController) curveChangeController = FindFirstObjectByType<CurveChangeController>();
 
         if (!playerTransform)
         {
@@ -310,13 +313,13 @@ public class ShotApproachFlowController : MonoBehaviour
 
         if (logGoalResolve)
         {
-            Debug.Log(
-                $"[ShotApproach] Checking distance | Player={playerTransform.position.z:F2} Goal={goalTransform.position.z:F2} dz={dz:F2}");
+            //Debug.Log(
+            //  $"[ShotApproach] Checking distance | Player={playerTransform.position.z:F2} Goal={goalTransform.position.z:F2} dz={dz:F2}");
         }
 
         if (dz <= shootingTriggerDistance)
         {
-            Debug.Log("[ShotApproach] Shooting distance reached. dz = " + dz);
+            //Debug.Log("[ShotApproach] Shooting distance reached. dz = " + dz);
             BeginShooting();
         }
     }
@@ -330,6 +333,9 @@ public class ShotApproachFlowController : MonoBehaviour
         _approachActive = false;
 
         Debug.Log("[ShotApproach] BeginShooting");
+
+        if (curveChangeController != null)
+            curveChangeController.SmoothToZero();
 
         if (shotSequenceController != null)
             shotSequenceController.EnterShotMode(playerTransform, goalTransform);
