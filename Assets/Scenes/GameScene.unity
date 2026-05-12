@@ -13754,7 +13754,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b133a2673e707f94bafcca8fa255cbf1, type: 2}
+  - {fileID: 2100000, guid: 05d18406b8cb2dd49830f2bcbc9b40e4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -15243,7 +15243,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 915f20e00477c874cbd5b1227625e9d0, type: 2}
+  - {fileID: 2100000, guid: 05d18406b8cb2dd49830f2bcbc9b40e4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -16246,6 +16246,7 @@ MonoBehaviour:
   keeperFrontCollider: {fileID: 1427704668}
   keeperWideCollider: {fileID: 1314406922}
   groundCollider: {fileID: 1857887748}
+  goalBoundsTolerance: 0.03
   enableGroundAutoExtension: 1
   autoExtendStepPixels: 30
   maxAutoExtendSteps: 40
@@ -23700,7 +23701,7 @@ Transform:
   m_GameObject: {fileID: 7481153133801916031}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.062904485, y: 1.1012247, z: 0.976}
+  m_LocalPosition: {x: 0, y: 1.1012247, z: 0.976}
   m_LocalScale: {x: 0.50829005, y: 1.6988101, z: 0.3158066}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -23947,19 +23948,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1755219317193681104}
   m_Mesh: {fileID: 828376790187704789, guid: 61601a6d6ecc34343b0fee46aea1ba6c, type: 3}
---- !u!114 &3362013563380203606
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7481153133801916031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aff0257eb08c0f5498c2d1add86dfbd5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::OpponentIdentity
-  BallSocket: {fileID: 0}
 --- !u!4 &3393154776486529655
 Transform:
   m_ObjectHideFlags: 0
@@ -24220,6 +24208,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7208261742459794708}
+  - component: {fileID: 7208261742459794709}
   m_Layer: 0
   m_Name: mixamorig:Head
   m_TagString: Untagged
@@ -24846,10 +24835,10 @@ Animator:
   m_GameObject: {fileID: 919132147682938254}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: f35022fe65f8a3b48be836b663ebfbf6, type: 3}
-  m_Controller: {fileID: 9100000, guid: 5571b5ac7f1dd514fa594327521ff3f1, type: 2}
+  m_Controller: {fileID: 9100000, guid: fe49daa632268cb4c8cee235f377de67, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
@@ -24929,34 +24918,6 @@ Transform:
   - {fileID: 2544483622384228236}
   m_Father: {fileID: 7789981938401283610}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5998538474879658520
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7481153133801916031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac8c5ff6d0089cc41973b03d04fa9a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ChasingOpponent
-  speed: 15
-  targetPlayer: {fileID: 0}
-  animator: {fileID: 5866666020160474446}
-  scaleAnimatorSpeed: 1
-  worldSpeedReference: 10
-  animatorSpeedMultiplier: 1
-  animatorSpeedMin: 0.85
-  animatorSpeedMax: 1.75
-  syncMoveSpeedToWorld: 1
-  worldSpeedReferenceOverride: 0
-  moveSyncMultiplier: 1
-  moveSyncExponent: 1
-  curveTriggerDistance: 20
-  curveStrength: 0.65
-  attackDistanceMin: 5
-  attackDistanceMax: 7
 --- !u!4 &6039136597587647435
 Transform:
   m_ObjectHideFlags: 0
@@ -25570,6 +25531,23 @@ Transform:
   - {fileID: 6039136597587647435}
   m_Father: {fileID: 9140253384787285462}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7208261742459794709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3897462236821823652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d921302a853921f4d9fe20049f354ad6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeeperHeadLookAtBall
+  ball: {fileID: 878252877}
+  rotateSpeed: 12
+  maxYaw: 70
+  maxPitch: 35
+  localForwardAxis: {x: 0, y: 0, z: 1}
 --- !u!1 &7246596528644637274
 GameObject:
   m_ObjectHideFlags: 0
@@ -25666,8 +25644,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2742444423508206737}
-  - component: {fileID: 5998538474879658520}
-  - component: {fileID: 3362013563380203606}
+  - component: {fileID: 7481153133801916032}
   m_Layer: 0
   m_Name: GoalKeeper
   m_TagString: Untagged
@@ -25675,6 +25652,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &7481153133801916032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7481153133801916031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09ec8caf7c384ba46827f6bae4929c48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeeperBasicMovement
+  player: {fileID: 1781460023}
+  animator: {fileID: 5866666020160474446}
+  playerXReadMode: 1
+  playerCenterX: 0
+  playerHalfRangeX: 10
+  keeperHalfRangeLocalX: 0.8
+  moveSpeed: 2.5
+  walkThreshold: 0.02
+  isWalkingParam: IsWalking
+  mirrorWalkParam: MirrorWalk
+  debugLogs: 0
 --- !u!1 &7492347807061885524
 GameObject:
   m_ObjectHideFlags: 0
