@@ -61,6 +61,27 @@ public class ShotTimeController : MonoBehaviour
         CurrentCountdownRemaining = 0f;
     }
 
+    // ✅ NEW:
+    // Swipe erken bittiğinde countdown'ı timeout gibi bitirmiş saymadan iptal eder.
+    // Ama slow-motion'ı hemen normale çeker.
+    public void CancelCountdownAndRestoreForCommit()
+    {
+        StopCurrentFlow();
+
+        CurrentCountdownRemaining = 0f;
+        OnCountdownValueChanged?.Invoke(0f);
+
+        CurrentState = TimeFlowState.Restoring;
+        OnRestoreStarted?.Invoke();
+
+        ApplyTimeScale(1f);
+
+        CurrentState = TimeFlowState.Completed;
+        OnFlowCompleted?.Invoke();
+
+        Debug.Log("[ShotTimeController] Countdown cancelled by swipe commit. Time restored immediately.");
+    }
+
     private IEnumerator ShotTimeFlowRoutine()
     {
         CurrentState = TimeFlowState.DelayingBeforeSlowmo;

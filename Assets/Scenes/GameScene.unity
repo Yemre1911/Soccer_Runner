@@ -3402,8 +3402,8 @@ Transform:
   m_GameObject: {fileID: 309782649}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.062839, y: -0.22000003, z: 1.5831211}
-  m_LocalScale: {x: 0.23030888, y: 0.8868941, z: 0.1430936}
+  m_LocalPosition: {x: -0.062866, y: -0.64751, z: 1.5831211}
+  m_LocalScale: {x: 0.2708202, y: 1.0139861, z: 0.1430936}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1475377425}
@@ -8382,6 +8382,7 @@ MonoBehaviour:
   autoResolveImmediately: 1
   allowEarlyCommitInput: 1
   debugCommitKey: 8
+  shotBallShooter: {fileID: 878252880}
   curveChangeController: {fileID: 0}
 --- !u!114 &832207275
 MonoBehaviour:
@@ -8896,7 +8897,7 @@ MonoBehaviour:
   visualizer: {fileID: 0}
   shotSequenceController: {fileID: 832207274}
   printToConsole: 1
-  showOnScreen: 1
+  showOnScreen: 0
   verboseLogBlocks: 1
   maxEntries: 8
 --- !u!1 &878252871
@@ -8915,6 +8916,7 @@ GameObject:
   - component: {fileID: 878252872}
   - component: {fileID: 878252878}
   - component: {fileID: 878252879}
+  - component: {fileID: 878252880}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Untagged
@@ -9194,6 +9196,30 @@ MonoBehaviour:
   opponentHitLayers:
     serializedVersion: 2
     m_Bits: 128
+--- !u!114 &878252880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878252871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 190caf0d799ffca4eb8c0c3044f49580, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShotBallShooter
+  ball: {fileID: 878252872}
+  fallbackTarget: {fileID: 0}
+  slowestDuration: 0.85
+  fastestDuration: 0.45
+  minArcHeight: 1.2
+  maxArcHeight: 3.2
+  maxCurveOffset: 3
+  invertCurveDirection: 1
+  fallbackForwardDistance: 22
+  fallbackHeight: 1.5
+  spinSpeed: 1500
+  useUnscaledTime: 1
 --- !u!1 &890663817
 GameObject:
   m_ObjectHideFlags: 0
@@ -13676,8 +13702,8 @@ Transform:
   m_GameObject: {fileID: 1314406920}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.8845, z: -0.17}
-  m_LocalScale: {x: 3.3673, y: 2.952102, z: 0.15343687}
+  m_LocalPosition: {x: 0.0000000075343, y: 0.8845, z: -0.17}
+  m_LocalScale: {x: 6.278331, y: 2.952102, z: 0.15343687}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2742444423508206737}
@@ -15165,8 +15191,8 @@ Transform:
   m_GameObject: {fileID: 1427704666}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.654, z: -0.4}
-  m_LocalScale: {x: 1.51, y: 2.4912255, z: 0.15343687}
+  m_LocalPosition: {x: 0.0000000074377, y: 0.9444, z: -0.4}
+  m_LocalScale: {x: 2.88561, y: 3.1717484, z: 0.15343687}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2742444423508206737}
@@ -18948,7 +18974,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.05, y: 2.5, z: 1.578}
-  m_LocalScale: {x: 3.979574, y: 5.1177683, z: -0.054329}
+  m_LocalScale: {x: 4.656101, y: 5.783078, z: -0.054329}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1977606616}
@@ -23740,7 +23766,7 @@ Transform:
   m_GameObject: {fileID: 2366098219611636644}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.38, z: 0}
+  m_LocalPosition: {x: 0, y: 0.38, z: -0.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
