@@ -26,6 +26,7 @@ public enum ShotHitType
     Goal,
     KeeperFront,
     KeeperWide,
+    KeeperUpper,
     Ground
 }
 
@@ -49,6 +50,7 @@ public enum ShotDecisionCode
     SavedByKeeperWideLowCurve = 31, // Anim: DiveUp, Top: her zaman DiveUp hizzasına (End Beyaz içinde olduğu sürece)   (kaşeci tutar)
     SavedGroundedGoalLane = 32,     // Anim: DiveDown, Top: Otonom swipe'son noktasına  (kaleciden sekecek)
     SavedGroundedKeeperLane = 33,   // Anim: HugDown, Top: "   "    "     "     "       (kaleci tutar)
+    SavedByKeeperUpper = 34,       // Anim: JumpCatch, top kafanın üstüne giderse
 
     // goals
     GoalDirect = 40,                // Anim: DiveUp, Top => target, 

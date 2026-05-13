@@ -8,31 +8,29 @@ public class ShotResolver : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool debugLogs = true;
 
-    public ShotDecisionResult Resolve(ShotSwipeIntent intent, ShotGoalTarget target, Transform goalTransform)
+  
+    public ShotDecisionResult Resolve(
+    ShotSwipeIntent intent,
+    ShotGoalTarget target,
+    Transform goalTransform)
     {
         ShotDecisionResult result = new ShotDecisionResult
         {
             Intent = intent,
             Target = target,
+            IsGoal = false,
             Outcome = ShotOutcomeType.MissOut,
             Code = ShotDecisionCode.None,
-            IsGoal = false,
-            Reason = "Default miss"
+            Reason = "Unresolved"
         };
 
-        if (intent == null)
+        if (intent == null || !intent.IsValid)
         {
-            result.Code = ShotDecisionCode.InvalidSwipe;
-            result.Reason = "Intent is null";
-            Log(result);
-            return result;
-        }
-
-        if (!intent.IsValid)
-        {
-            result.Outcome = intent.EndedByTimeout ? ShotOutcomeType.TimeoutOut : ShotOutcomeType.MissOut;
-            result.Code = intent.EndedByTimeout ? ShotDecisionCode.Timeout : ShotDecisionCode.InvalidSwipe;
-            result.Reason = intent.EndedByTimeout ? "Timeout / incomplete swipe" : "Invalid swipe";
+            result.Outcome = ShotOutcomeType.TimeoutOut;
+            result.Code = intent != null && intent.EndedByTimeout
+                ? ShotDecisionCode.Timeout
+                : ShotDecisionCode.InvalidSwipe;
+            result.Reason = "Invalid swipe";
             Log(result);
             return result;
         }
@@ -41,16 +39,7 @@ public class ShotResolver : MonoBehaviour
         {
             result.Outcome = ShotOutcomeType.MissOut;
             result.Code = ShotDecisionCode.MalformedOut;
-            result.Reason = "Malformed path / loopy swipe";
-            Log(result);
-            return result;
-        }
-
-        if (intent.Kind == ShotSwipeKind.OverCurve)
-        {
-            result.Outcome = ShotOutcomeType.MissWide;
-            result.Code = ShotDecisionCode.OverCurveOut;
-            result.Reason = "Curve amount too high";
+            result.Reason = "Malformed swipe path";
             Log(result);
             return result;
         }
@@ -59,30 +48,55 @@ public class ShotResolver : MonoBehaviour
         {
             result.Outcome = ShotOutcomeType.MissOut;
             result.Code = ShotDecisionCode.ZigZagOut;
-            result.Reason = "Zigzag / unstable swipe";
+            result.Reason = "Zigzag swipe";
             Log(result);
             return result;
         }
 
-        if (target == null)
+        if (intent.Kind == ShotSwipeKind.OverCurve)
         {
             result.Outcome = ShotOutcomeType.MissOut;
-            result.Code = ShotDecisionCode.MissedNoTarget;
-            result.Reason = "Target data missing";
+            result.Code = ShotDecisionCode.OverCurveOut;
+            result.Reason = "Over curve swipe";
             Log(result);
             return result;
         }
 
-        if (!target.InsideGoal)
+        /*
+         * KRİTİK FIX:
+         * Ground başlayan swipe'ları InsideGoal kontrolünden önce çöz.
+         * Çünkü ground swipe'larda final projected point dışarıda olabilir,
+         * ama auto-extension keeper/goal collider'a ulaşmış olabilir.
+         */
+        if (target != null && target.InitialHitType == ShotHitType.Ground)
         {
-            ResolveOutsideGoal(target, result);
+            ResolveGroundedSwipe(target, result);
+            Log(result);
+            return result;
+        }
+
+        if (target == null || !target.InsideGoal)
+        {
+            result.IsGoal = false;
+            result.Outcome = ShotOutcomeType.MissOut;
+            result.Code = ShotDecisionCode.MissedNoTarget;
+            result.Reason = "Shot target is outside fixed goal bounds: out";
             Log(result);
             return result;
         }
 
         switch (target.InitialHitType)
         {
+            case ShotHitType.KeeperUpper:
+                result.IsGoal = false;
+                result.Outcome = ShotOutcomeType.Saved;
+                result.Code = ShotDecisionCode.SavedByKeeperUpper;
+                result.Reason = "Upper keeper collider inside goal bounds: jump catch save";
+                Log(result);
+                return result;
+
             case ShotHitType.KeeperFront:
+                result.IsGoal = false;
                 result.Outcome = ShotOutcomeType.Saved;
                 result.Code = ShotDecisionCode.SavedByKeeperFront;
                 result.Reason = "Front keeper collider inside goal bounds: guaranteed save";
@@ -91,11 +105,6 @@ public class ShotResolver : MonoBehaviour
 
             case ShotHitType.KeeperWide:
                 ResolveWideKeeper(intent, target, result);
-                Log(result);
-                return result;
-
-            case ShotHitType.Ground:
-                ResolveGroundedSwipe(target, result);
                 Log(result);
                 return result;
 
@@ -108,9 +117,10 @@ public class ShotResolver : MonoBehaviour
                 return result;
 
             default:
+                result.IsGoal = false;
                 result.Outcome = ShotOutcomeType.MissOut;
                 result.Code = ShotDecisionCode.MissedNoTarget;
-                result.Reason = "Inside goal bounds but did not hit keeper, ground, or goal";
+                result.Reason = "Inside goal bounds but did not hit keeper or goal";
                 Log(result);
                 return result;
         }
@@ -188,22 +198,30 @@ public class ShotResolver : MonoBehaviour
         }
     }
 
+
     private void ResolveGroundedSwipe(ShotGoalTarget target, ShotDecisionResult result)
     {
         switch (target.AutoExtendedResolvedHitType)
         {
+            case ShotHitType.KeeperUpper:
+                result.IsGoal = false;
+                result.Outcome = ShotOutcomeType.Saved;
+                result.Code = ShotDecisionCode.SavedByKeeperUpper;
+                result.Reason = "Grounded swipe auto-extended into upper keeper lane: jump catch save";
+                return;
+
             case ShotHitType.KeeperFront:
                 result.IsGoal = false;
                 result.Outcome = ShotOutcomeType.Saved;
                 result.Code = ShotDecisionCode.SavedGroundedKeeperLane;
-                result.Reason = "Grounded swipe auto-extended into front keeper inside goal bounds: saved";
+                result.Reason = "Grounded swipe auto-extended into front keeper lane: ground catch save";
                 return;
 
             case ShotHitType.KeeperWide:
                 result.IsGoal = false;
                 result.Outcome = ShotOutcomeType.Saved;
                 result.Code = ShotDecisionCode.SavedGroundedKeeperLane;
-                result.Reason = "Grounded swipe auto-extended into wide keeper lane inside goal bounds: saved";
+                result.Reason = "Grounded swipe auto-extended into wide keeper lane: ground catch save";
                 return;
 
             case ShotHitType.Goal:

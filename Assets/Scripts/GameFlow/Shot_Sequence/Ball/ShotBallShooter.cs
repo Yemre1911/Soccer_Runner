@@ -165,6 +165,7 @@ public class ShotBallShooter : MonoBehaviour
             case ShotDecisionCode.SavedByKeeperWideLowCurve:
             case ShotDecisionCode.SavedGroundedGoalLane:
             case ShotDecisionCode.SavedGroundedKeeperLane:
+            case ShotDecisionCode.SavedByKeeperUpper:
                 return true;
 
             default:

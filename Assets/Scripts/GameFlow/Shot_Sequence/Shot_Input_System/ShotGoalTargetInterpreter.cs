@@ -10,6 +10,7 @@ public class ShotGoalTargetInterpreter : MonoBehaviour
     [SerializeField] private Collider keeperFrontCollider;
     [SerializeField] private Collider keeperWideCollider;
     [SerializeField] private Collider groundCollider;
+    [SerializeField] private Collider keeperUpperCollider;
 
     [Header("Goal Bounds")]
     [Tooltip("Goal bounds kontrolünde çok küçük tolerans. Kenar çizgisinde false dönmesini engeller.")]
@@ -157,9 +158,18 @@ public class ShotGoalTargetInterpreter : MonoBehaviour
         return hitType;
     }
 
+
     private ShotHitType RaycastPriority(Ray ray, out RaycastHit bestHit)
     {
         bestHit = default;
+
+        /*
+         * Upper'ı önce kontrol ediyoruz.
+         * Eğer upper collider front/wide ile çakışıyorsa,
+         * swipe noktası upper alanına geldiğinde JumpCatch kararının kaçmaması için bu daha güvenli.
+         */
+        if (TryRaycast(keeperUpperCollider, ray, out bestHit))
+            return ShotHitType.KeeperUpper;
 
         if (TryRaycast(keeperFrontCollider, ray, out bestHit))
             return ShotHitType.KeeperFront;

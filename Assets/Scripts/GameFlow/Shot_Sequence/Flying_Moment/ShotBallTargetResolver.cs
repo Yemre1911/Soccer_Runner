@@ -52,6 +52,7 @@ public class ShotBallTargetResolver : MonoBehaviour
             case ShotDecisionCode.SavedByKeeperWideLowCurve:
             case ShotDecisionCode.SavedGroundedGoalLane:
             case ShotDecisionCode.SavedGroundedKeeperLane:
+            case ShotDecisionCode.SavedByKeeperUpper:
                 resolvedTarget = ResolveDecisionWorldPointOrFallback(decision, startPoint, directionReference);
                 Log(decision, resolvedTarget, "Goal/Save -> decision target");
                 return resolvedTarget;
