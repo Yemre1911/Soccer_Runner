@@ -11,6 +11,7 @@ TagManager:
   - ShotGround
   - ShotGoalArea
   - ShotKeeperUpper
+  - Ball
   layers:
   - Default
   - TransparentFX
