@@ -66,6 +66,9 @@ public class ShotSequenceController : MonoBehaviour
     [Header("Shot Ball")]
     [SerializeField] private ShotBallShooter shotBallShooter;
 
+    [Header("Shot Keeper")]
+    [SerializeField] private ShotKeeperController shotKeeperController;
+
     public ShotFlowState CurrentState { get; private set; } = ShotFlowState.Idle;
     public ShotDecisionResult LastDecision { get; private set; }
 
@@ -128,6 +131,9 @@ public class ShotSequenceController : MonoBehaviour
             shotSwipeVisualizer = FindFirstObjectByType<ShotSwipeVisualizer>();
 
         if (!curveChangeController) curveChangeController = FindFirstObjectByType<CurveChangeController>();
+
+        if (!shotKeeperController)
+            shotKeeperController = FindFirstObjectByType<ShotKeeperController>();
 
     }
 
@@ -203,6 +209,9 @@ public class ShotSequenceController : MonoBehaviour
         _commitStarted = false;
         _pendingAutoCommitFromTimeout = false;
         LastDecision = null;
+
+        if (shotKeeperController != null)
+            shotKeeperController.ResetKeeperReaction();
 
         Debug.Log(
             $"[ShotSequence] EnterShotMode | Player={(_playerTransform ? _playerTransform.name : "NULL")} | Goal={(_goalTransform ? _goalTransform.name : "NULL")}"
@@ -429,27 +438,6 @@ public class ShotSequenceController : MonoBehaviour
         };
     }
 
-    /*private void StartCommitWithPreparedDecision()
-    {
-        if (_commitStarted)
-            return;
-
-        if (CurrentState != ShotFlowState.WaitingForShotInput)
-            return;
-
-        _commitStarted = true;
-
-        if (shotSwipeInputReader != null)
-            shotSwipeInputReader.StopListening();
-
-        if (_commitRoutine != null)
-            StopCoroutine(_commitRoutine);
-
-        if (shotSwipeVisualizer != null)
-            shotSwipeVisualizer.Clear();
-
-        _commitRoutine = StartCoroutine(CommitShotDecisionRoutine());
-    }*/
 
     private void StartCommitWithPreparedDecision(bool restoreShotTimeImmediately)
     {
@@ -479,7 +467,7 @@ public class ShotSequenceController : MonoBehaviour
         _commitRoutine = StartCoroutine(CommitShotDecisionRoutine());
     }
 
-    private IEnumerator CommitShotDecisionRoutine()
+    /*private IEnumerator CommitShotDecisionRoutine()
     {
         SetState(ShotFlowState.CommittingShot);
 
@@ -487,6 +475,51 @@ public class ShotSequenceController : MonoBehaviour
             shotBallShooter.Shoot(LastDecision);
         else
             Debug.LogWarning("[ShotSequenceController] ShotBallShooter or LastDecision is missing.");
+
+        Debug.Log("[ShotSequenceController] Commit started.");
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetWorldMovementForcedStopped(true);
+            GameManager.Instance.SetSpeedMultiplier(0f);
+            GameManager.Instance.SetSimulationPaused(true);
+        }
+
+        OnShotCommitted?.Invoke();
+
+        SetState(ShotFlowState.TransitioningToCommitView);
+
+        if (shotCommitCameraController != null)
+            yield return shotCommitCameraController.PullBackFromCurrentView();
+
+        SetState(ShotFlowState.ReadyToResolveShot);
+
+        Debug.Log("[ShotSequenceController] Commit complete. ReadyToResolveShot.");
+
+        if (autoResolveImmediately && LastDecision != null)
+            ResolveShot(LastDecision.IsGoal);
+
+        _commitRoutine = null;
+    }*/
+
+    private IEnumerator CommitShotDecisionRoutine()
+    {
+        SetState(ShotFlowState.CommittingShot);
+
+        if (LastDecision != null)
+        {
+            if (shotKeeperController != null)
+                shotKeeperController.React(LastDecision);
+
+            if (shotBallShooter != null)
+                shotBallShooter.Shoot(LastDecision);
+            else
+                Debug.LogWarning("[ShotSequenceController] ShotBallShooter is missing.");
+        }
+        else
+        {
+            Debug.LogWarning("[ShotSequenceController] LastDecision is missing.");
+        }
 
         Debug.Log("[ShotSequenceController] Commit started.");
 

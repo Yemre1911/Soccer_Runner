@@ -19,7 +19,7 @@ public class ShotSwipeVisualizer : MonoBehaviour
     [SerializeField] private int maxPointCount = 128;
 
     [Header("Resolved Extension Debug")]
-    [SerializeField] private bool showResolvedExtension = true;
+    [SerializeField] private bool showResolvedExtension = false;
 
     private LineRenderer _lineRenderer;
     private readonly List<Vector3> _worldPoints = new List<Vector3>();

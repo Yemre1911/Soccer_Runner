@@ -5,35 +5,54 @@ public class ShotBallShooter : MonoBehaviour
     [Header("References")]
     [SerializeField] private BallController ball;
 
-    [Tooltip("Eğer decision içinde geçerli world target yoksa fallback olarak kullanılabilir.")]
-    [SerializeField] private Transform fallbackTarget;
+    [Tooltip("Decision code'a göre topun gerçek uçuş hedefini çözer.")]
+    [SerializeField] private ShotBallTargetResolver targetResolver;
+
+    [Tooltip("Topun ileri/sağ yönünü çözmek için referans. Genelde player root veya shot camera pivot olabilir.")]
+    [SerializeField] private Transform directionReference;
 
     [Header("Flight Duration")]
     [SerializeField] private float slowestDuration = 0.85f;
     [SerializeField] private float fastestDuration = 0.45f;
 
+    [Header("Invalid / Weak Shot Duration")]
+    [Tooltip("Kısa swipe, timeout, invalid gibi kötü şutlarda top biraz daha zayıf hissettirsin.")]
+    [SerializeField] private float invalidShotDuration = 0.75f;
+
     [Header("Arc")]
     [SerializeField] private float minArcHeight = 1.2f;
     [SerializeField] private float maxArcHeight = 3.2f;
+
+    [Header("Invalid / Weak Shot Arc")]
+    [SerializeField] private float invalidShotArcHeight = 0.9f;
 
     [Header("Curve")]
     [SerializeField] private float maxCurveOffset = 2.2f;
     [SerializeField] private bool invertCurveDirection = true;
 
-    [Header("Fallback Target")]
-    [SerializeField] private float fallbackForwardDistance = 22f;
-    [SerializeField] private float fallbackHeight = 1.5f;
+    [Header("Raw Fallback")]
+    [Tooltip("Resolver yoksa veya hiçbir veri yoksa kullanılacak ileri mesafe.")]
+    [SerializeField] private float rawFallbackForwardDistance = 22f;
+
+    [SerializeField] private float rawFallbackHeight = 1.5f;
 
     [Header("Spin")]
     [SerializeField] private float spinSpeed = 1500f;
+    [SerializeField] private float invalidShotSpinSpeed = 850f;
 
     [Header("Timing")]
     [SerializeField] private bool useUnscaledTime = true;
+
+    [Header("Debug")]
+    [SerializeField] private bool logDebug = true;
 
     private void Awake()
     {
         if (!ball)
             ball = GetComponent<BallController>();
+
+        if (!directionReference)
+            directionReference = transform;
     }
 
     public void Shoot(ShotDecisionResult decision)
@@ -54,26 +73,56 @@ public class ShotBallShooter : MonoBehaviour
         Vector3 startPoint = ball.transform.position;
         Vector3 targetPoint = ResolveTargetPoint(decision, startPoint);
 
+        bool invalidOrBadShot = IsInvalidOrBadShot(decision);
+
         float power01 = ResolvePower01(decision);
 
-        float duration = Mathf.Lerp(slowestDuration, fastestDuration, power01);
-        float arcHeight = Mathf.Lerp(maxArcHeight, minArcHeight, power01);
+        float duration = invalidOrBadShot
+            ? invalidShotDuration
+            : Mathf.Lerp(slowestDuration, fastestDuration, power01);
+
+        float arcHeight = invalidOrBadShot
+            ? invalidShotArcHeight
+            : Mathf.Lerp(maxArcHeight, minArcHeight, power01);
 
         float curveSigned01 = ResolveCurveSigned01(decision);
+
         if (invertCurveDirection)
             curveSigned01 *= -1f;
 
-        float curveOffset = curveSigned01 * maxCurveOffset;
+        float curveOffset = invalidOrBadShot
+            ? 0f
+            : curveSigned01 * maxCurveOffset;
 
-        Debug.Log(
-    $"[ShotBallShooter] Curve Debug | " +
-    $"Kind: {decision?.Intent?.Kind}, " +
-    $"IsValid: {decision?.Intent?.IsValid}, " +
-    $"IsCurveAcceptable: {decision?.Intent?.IsCurveAcceptable}, " +
-    $"CurveSigned01: {decision?.Intent?.CurveSigned01}, " +
-    $"CurveAbs01: {decision?.Intent?.CurveAbs01}, " +
-    $"FinalCurveOffset: {curveOffset}"
-);
+        float resolvedSpinSpeed = invalidOrBadShot
+            ? invalidShotSpinSpeed
+            : spinSpeed;
+
+        if (logDebug)
+        {
+            Debug.Log(
+                $"[ShotBallShooter] BuildFlightData | " +
+                $"Code: {decision?.Code}, " +
+                $"Outcome: {decision?.Outcome}, " +
+                $"Start: {startPoint}, " +
+                $"Target: {targetPoint}, " +
+                $"Power01: {power01}, " +
+                $"Duration: {duration}, " +
+                $"Arc: {arcHeight}, " +
+                $"CurveOffset: {curveOffset}, " +
+                $"Spin: {resolvedSpinSpeed}"
+            );
+
+            Debug.Log(
+                $"[ShotBallShooter] Curve Debug | " +
+                $"Kind: {decision?.Intent?.Kind}, " +
+                $"IsValid: {decision?.Intent?.IsValid}, " +
+                $"IsCurveAcceptable: {decision?.Intent?.IsCurveAcceptable}, " +
+                $"CurveSigned01: {decision?.Intent?.CurveSigned01}, " +
+                $"CurveAbs01: {decision?.Intent?.CurveAbs01}, " +
+                $"FinalCurveOffset: {curveOffset}"
+            );
+        }
 
         return new ShotBallFlightData
         {
@@ -83,7 +132,7 @@ public class ShotBallShooter : MonoBehaviour
             Duration = duration,
             ArcHeight = arcHeight,
             CurveOffset = curveOffset,
-            SpinSpeed = spinSpeed,
+            SpinSpeed = resolvedSpinSpeed,
 
             UseUnscaledTime = useUnscaledTime,
 
@@ -93,21 +142,50 @@ public class ShotBallShooter : MonoBehaviour
 
     private Vector3 ResolveTargetPoint(ShotDecisionResult decision, Vector3 startPoint)
     {
-        if (HasUsableDecisionTarget(decision))
+        if (targetResolver != null)
+            return targetResolver.ResolveTarget(decision, startPoint, directionReference);
+
+        if (ShouldUseDecisionTargetWithoutResolver(decision))
             return decision.Target.WorldPoint;
 
-        if (fallbackTarget != null)
-            return fallbackTarget.position;
+        return ResolveRawFallbackTarget(startPoint);
+    }
 
-        Vector3 fallbackDirection = transform.forward;
-        fallbackDirection.y = 0f;
+    private bool ShouldUseDecisionTargetWithoutResolver(ShotDecisionResult decision)
+    {
+        if (!HasUsableDecisionTarget(decision))
+            return false;
 
-        if (fallbackDirection.sqrMagnitude < 0.001f)
-            fallbackDirection = Vector3.forward;
+        switch (decision.Code)
+        {
+            case ShotDecisionCode.GoalDirect:
+            case ShotDecisionCode.GoalWideKeeperCurveBeat:
 
-        fallbackDirection.Normalize();
+            case ShotDecisionCode.SavedByKeeperFront:
+            case ShotDecisionCode.SavedByKeeperWideLowCurve:
+            case ShotDecisionCode.SavedGroundedGoalLane:
+            case ShotDecisionCode.SavedGroundedKeeperLane:
+                return true;
 
-        return startPoint + fallbackDirection * fallbackForwardDistance + Vector3.up * fallbackHeight;
+            default:
+                return false;
+        }
+    }
+
+    private Vector3 ResolveRawFallbackTarget(Vector3 startPoint)
+    {
+        Vector3 forward = directionReference ? directionReference.forward : transform.forward;
+        forward.y = 0f;
+
+        if (forward.sqrMagnitude < 0.001f)
+            forward = Vector3.forward;
+
+        forward.Normalize();
+
+        Vector3 target = startPoint + forward * rawFallbackForwardDistance;
+        target.y = Mathf.Max(target.y, rawFallbackHeight);
+
+        return target;
     }
 
     private bool HasUsableDecisionTarget(ShotDecisionResult decision)
@@ -118,19 +196,6 @@ public class ShotBallShooter : MonoBehaviour
         if (decision.Target == null)
             return false;
 
-        if (decision.Target.FinalHitType != ShotHitType.None)
-            return true;
-
-        if (decision.Target.InitialHitType != ShotHitType.None)
-            return true;
-
-        if (decision.Target.AutoExtendedResolvedHitType != ShotHitType.None)
-            return true;
-
-        if (decision.Target.InsideGoal)
-            return true;
-
-        // WorldPoint gerçekten set edilmiş mi diye son güvenlik.
         if (decision.Target.WorldPoint.sqrMagnitude > 0.001f)
             return true;
 
@@ -144,7 +209,6 @@ public class ShotBallShooter : MonoBehaviour
 
         return Mathf.Clamp01(decision.Intent.Power01);
     }
-
 
     private float ResolveCurveSigned01(ShotDecisionResult decision)
     {
@@ -173,10 +237,27 @@ public class ShotBallShooter : MonoBehaviour
         float sign = Mathf.Sign(rawCurve);
         float absCurve = Mathf.Abs(rawCurve);
 
-        // Görsel curve güçlendirmesi.
-        // 0.14 gibi küçük ama Curve sayılan swipe'lar ekranda belli olsun.
         float visualCurve = Mathf.Lerp(0.35f, 1f, absCurve);
 
         return sign * visualCurve;
+    }
+
+    private bool IsInvalidOrBadShot(ShotDecisionResult decision)
+    {
+        if (decision == null)
+            return true;
+
+        switch (decision.Code)
+        {
+            case ShotDecisionCode.InvalidSwipe:
+            case ShotDecisionCode.Timeout:
+            case ShotDecisionCode.OverCurveOut:
+            case ShotDecisionCode.ZigZagOut:
+            case ShotDecisionCode.MalformedOut:
+                return true;
+
+            default:
+                return false;
+        }
     }
 }
