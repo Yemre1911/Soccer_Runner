@@ -36,6 +36,9 @@ public class BallShotFinalImpactState : IBallState
         _start = ball.transform.position;
         _mode = ResolveMode(_data);
 
+        if (_data != null)
+            ball.NotifyShotFinalImpact(_data.Decision);
+
         switch (_mode)
         {
             case FinalImpactMode.GoalContinue:

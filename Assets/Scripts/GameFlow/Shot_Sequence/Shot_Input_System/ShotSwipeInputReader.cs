@@ -14,6 +14,10 @@ public class ShotSwipeInputReader : MonoBehaviour
     public event Action<List<Vector2>> OnSwipeUpdated;
     public event Action<RawSwipeData> OnSwipeCompleted;
 
+    [Header("Swipe Area Gate")]
+    [SerializeField] private ShotSwipeAreaCircle swipeAreaCircle;
+    [SerializeField] private bool requireValidSwipeAreaStart = true;
+
     private RawSwipeData _currentSwipe;
 
     public void BeginListening()
@@ -95,8 +99,28 @@ public class ShotSwipeInputReader : MonoBehaviour
             FinishSwipe(mousePos);
     }
 
+    /*private void StartSwipe(Vector2 screenPos)
+    {
+        _currentSwipe = new RawSwipeData
+        {
+            StartRealtime = Time.realtimeSinceStartup
+        };
+
+        _currentSwipe.Points.Add(screenPos);
+
+        IsSwiping = true;
+        OnSwipeStarted?.Invoke();
+        OnSwipeUpdated?.Invoke(_currentSwipe.Points);
+    }*/
     private void StartSwipe(Vector2 screenPos)
     {
+        if (requireValidSwipeAreaStart &&
+            swipeAreaCircle != null &&
+            !swipeAreaCircle.IsScreenPointAllowed(screenPos))
+        {
+            return;
+        }
+
         _currentSwipe = new RawSwipeData
         {
             StartRealtime = Time.realtimeSinceStartup

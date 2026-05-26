@@ -19,6 +19,9 @@ public class ShotSequenceController : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private GameObject retryButtonRoot;
+    [Header("Swipe Area UI")]
+    [SerializeField] private ShotSwipeAreaCircle shotSwipeAreaCircle;
+    [SerializeField] private Camera shotSwipeAreaCamera;
 
     [Header("Core References")]
     [SerializeField] private PlayerInput playerInput;
@@ -135,6 +138,12 @@ public class ShotSequenceController : MonoBehaviour
         if (!shotKeeperController)
             shotKeeperController = FindFirstObjectByType<ShotKeeperController>();
 
+        if (!shotSwipeAreaCircle)
+            shotSwipeAreaCircle = FindFirstObjectByType<ShotSwipeAreaCircle>();
+
+        if (!shotSwipeAreaCamera)
+            shotSwipeAreaCamera = Camera.main;
+
     }
 
     private void OnEnable()
@@ -180,6 +189,9 @@ public class ShotSequenceController : MonoBehaviour
 
         if (shotSwipeVisualizer != null)
             shotSwipeVisualizer.Clear();
+
+        if (shotSwipeAreaCircle != null)
+            shotSwipeAreaCircle.HideImmediate();
     }
 
     private void Update()
@@ -268,6 +280,9 @@ public class ShotSequenceController : MonoBehaviour
         if (shotSwipeVisualizer != null)
             shotSwipeVisualizer.Clear();
 
+        if (shotSwipeAreaCircle != null)
+            shotSwipeAreaCircle.HideImmediate();
+
         OnRetryRequested?.Invoke();
         SessionBootstrap.ReloadLastConfig("GameScene");
     }
@@ -299,10 +314,18 @@ public class ShotSequenceController : MonoBehaviour
         if (ballController != null && stopBallDribbleOnEnter)
             ballController.EnterIdle(true);
 
+        /*if (playerAnimationController != null)
+            playerAnimationController.PlayShoot(mirrorShot);
+
+        SetState(ShotFlowState.WaitingForShotInput);*/
         if (playerAnimationController != null)
             playerAnimationController.PlayShoot(mirrorShot);
 
+        if (shotSwipeAreaCircle != null && ballController != null && _goalTransform != null)
+            shotSwipeAreaCircle.Show(ballController.transform, _goalTransform, shotSwipeAreaCamera);
+
         SetState(ShotFlowState.WaitingForShotInput);
+        //----------------------------------------------------------------------------------------------
 
         if (shotSwipeInputReader != null)
             shotSwipeInputReader.BeginListening();
@@ -458,6 +481,9 @@ public class ShotSequenceController : MonoBehaviour
         if (shotSwipeInputReader != null)
             shotSwipeInputReader.StopListening();
 
+        if (shotSwipeAreaCircle != null)
+            shotSwipeAreaCircle.HideImmediate();
+
         if (_commitRoutine != null)
             StopCoroutine(_commitRoutine);
 
@@ -466,41 +492,6 @@ public class ShotSequenceController : MonoBehaviour
 
         _commitRoutine = StartCoroutine(CommitShotDecisionRoutine());
     }
-
-    /*private IEnumerator CommitShotDecisionRoutine()
-    {
-        SetState(ShotFlowState.CommittingShot);
-
-        if (shotBallShooter != null && LastDecision != null)
-            shotBallShooter.Shoot(LastDecision);
-        else
-            Debug.LogWarning("[ShotSequenceController] ShotBallShooter or LastDecision is missing.");
-
-        Debug.Log("[ShotSequenceController] Commit started.");
-
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.SetWorldMovementForcedStopped(true);
-            GameManager.Instance.SetSpeedMultiplier(0f);
-            GameManager.Instance.SetSimulationPaused(true);
-        }
-
-        OnShotCommitted?.Invoke();
-
-        SetState(ShotFlowState.TransitioningToCommitView);
-
-        if (shotCommitCameraController != null)
-            yield return shotCommitCameraController.PullBackFromCurrentView();
-
-        SetState(ShotFlowState.ReadyToResolveShot);
-
-        Debug.Log("[ShotSequenceController] Commit complete. ReadyToResolveShot.");
-
-        if (autoResolveImmediately && LastDecision != null)
-            ResolveShot(LastDecision.IsGoal);
-
-        _commitRoutine = null;
-    }*/
 
     private IEnumerator CommitShotDecisionRoutine()
     {

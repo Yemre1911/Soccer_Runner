@@ -37,6 +37,10 @@ public class PlayerAnimationController : MonoBehaviour
     private static readonly int SpinMirrorBool = Animator.StringToHash("SpinMirror");
     private static readonly int ShootTrigger = Animator.StringToHash("Shoot");
     private static readonly int ShootMirrorBool = Animator.StringToHash("ShootMirror");
+    private static readonly int Victory1Trigger = Animator.StringToHash("V1");
+    private static readonly int Victory2Trigger = Animator.StringToHash("V2");
+    private static readonly int Victory3Trigger = Animator.StringToHash("V3");
+    private static readonly int Defeat1Trigger = Animator.StringToHash("D1");
 
     private bool _isGrounded;
     private bool _collapsed;
@@ -218,5 +222,54 @@ public class PlayerAnimationController : MonoBehaviour
 
         if (!isRunning)
             _animator.SetFloat(RunSpeedFloat, 0f);
+    }
+
+    public void PlayShotVictoryRandom()
+    {
+        if (_collapsed) return;
+
+        EnableRootMotionForShotResult();
+        ResetShotResultTriggers();
+
+        int random = Random.Range(0, 3);
+
+        switch (random)
+        {
+            case 0:
+                _animator.SetTrigger(Victory1Trigger);
+                break;
+
+            case 1:
+                _animator.SetTrigger(Victory2Trigger);
+                break;
+
+            default:
+                _animator.SetTrigger(Victory3Trigger);
+                break;
+        }
+    }
+
+    public void PlayShotDefeat()
+    {
+        if (_collapsed) return;
+
+        EnableRootMotionForShotResult();
+        ResetShotResultTriggers();
+
+        _animator.SetTrigger(Defeat1Trigger);
+    }
+
+    private void ResetShotResultTriggers()
+    {
+        _animator.ResetTrigger(Victory1Trigger);
+        _animator.ResetTrigger(Victory2Trigger);
+        _animator.ResetTrigger(Victory3Trigger);
+        _animator.ResetTrigger(Defeat1Trigger);
+    }
+
+    private void EnableRootMotionForShotResult()
+    {
+        if (_animator != null)
+            _animator.applyRootMotion = true;
     }
 }
