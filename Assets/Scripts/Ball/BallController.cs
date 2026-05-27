@@ -22,10 +22,23 @@ public class BallController : MonoBehaviour
     [Tooltip("Deflect/save rebound yönü için oyuncu veya kamera/player tarafı referansı.")]
     [SerializeField] private Transform playerReference;
 
-    [Header("Final Impact - Goal")]
+    [Header("Final Impact - Goal Continue")]
     [SerializeField] private float goalContinueDistance = 7f;
     [SerializeField] private float goalContinueDuration = 0.35f;
     [SerializeField] private float goalContinueArcHeight = 0.6f;
+
+    [Header("Final Impact - Goal Drop")]
+    [Tooltip("Gol sonrası topun ineceği global zemin Y pozisyonu.")]
+    [SerializeField] private float goalGroundY = -0.52f;
+
+    [Tooltip("Top kalenin içine girdikten sonra zemine kaç saniyede insin?")]
+    [SerializeField] private float goalDropDuration = 0.55f;
+
+    [Tooltip("Yere inerken spin başlangıç çarpanı. 1 = mevcut spinSpeed, 0.5 = yarısı.")]
+    [SerializeField] private float goalDropStartSpinMultiplier = 0.65f;
+
+    [Tooltip("İniş sırasında çok hafif ekstra ileri kayma. Genelde 0 bırakabilirsin.")]
+    [SerializeField] private float goalDropForwardSlideDistance = 0f;
 
     [Header("Final Impact - Out / Miss")]
     [SerializeField] private float outContinueDistance = 6f;
@@ -65,6 +78,11 @@ public class BallController : MonoBehaviour
     public float GoalContinueDistance => goalContinueDistance;
     public float GoalContinueDuration => goalContinueDuration;
     public float GoalContinueArcHeight => goalContinueArcHeight;
+
+    public float GoalGroundY => goalGroundY;
+    public float GoalDropDuration => goalDropDuration;
+    public float GoalDropStartSpinMultiplier => goalDropStartSpinMultiplier;
+    public float GoalDropForwardSlideDistance => goalDropForwardSlideDistance;
 
     public float OutContinueDistance => outContinueDistance;
     public float OutContinueDuration => outContinueDuration;

@@ -88,6 +88,7 @@ public class ShotSequenceController : MonoBehaviour
 
     private bool _commitStarted;
     private bool _pendingAutoCommitFromTimeout;
+    private bool _allowSwipeVisual;
 
     [SerializeField] private CurveChangeController curveChangeController;
 
@@ -187,8 +188,7 @@ public class ShotSequenceController : MonoBehaviour
         if (shotSwipeInputReader != null)
             shotSwipeInputReader.OnSwipeUpdated -= HandleSwipeUpdated;
 
-        if (shotSwipeVisualizer != null)
-            shotSwipeVisualizer.Clear();
+        HideSwipeVisualImmediate();
 
         if (shotSwipeAreaCircle != null)
             shotSwipeAreaCircle.HideImmediate();
@@ -277,8 +277,7 @@ public class ShotSequenceController : MonoBehaviour
             GameManager.Instance.SetSpeedMultiplier(1f);
         }
 
-        if (shotSwipeVisualizer != null)
-            shotSwipeVisualizer.Clear();
+        HideSwipeVisualImmediate();
 
         if (shotSwipeAreaCircle != null)
             shotSwipeAreaCircle.HideImmediate();
@@ -314,10 +313,6 @@ public class ShotSequenceController : MonoBehaviour
         if (ballController != null && stopBallDribbleOnEnter)
             ballController.EnterIdle(true);
 
-        /*if (playerAnimationController != null)
-            playerAnimationController.PlayShoot(mirrorShot);
-
-        SetState(ShotFlowState.WaitingForShotInput);*/
         if (playerAnimationController != null)
             playerAnimationController.PlayShoot(mirrorShot);
 
@@ -327,6 +322,7 @@ public class ShotSequenceController : MonoBehaviour
         SetState(ShotFlowState.WaitingForShotInput);
         //----------------------------------------------------------------------------------------------
 
+        EnableSwipeVisual();
         if (shotSwipeInputReader != null)
             shotSwipeInputReader.BeginListening();
 
@@ -344,8 +340,7 @@ public class ShotSequenceController : MonoBehaviour
 
     private void HandleSwipeCompleted(RawSwipeData rawSwipe)
     {
-        if (shotSwipeVisualizer != null)
-            shotSwipeVisualizer.Clear();
+        HideSwipeVisualImmediate();
 
         if (_commitStarted)
             return;
@@ -353,8 +348,6 @@ public class ShotSequenceController : MonoBehaviour
         if (CurrentState != ShotFlowState.WaitingForShotInput)
             return;
 
-        //PrepareDecisionFromSwipe(rawSwipe);
-        //StartCommitWithPreparedDecision();
         PrepareDecisionFromSwipe(rawSwipe);
         StartCommitWithPreparedDecision(true);
     }
@@ -371,8 +364,7 @@ public class ShotSequenceController : MonoBehaviour
         if (_commitStarted)
             return;
 
-        if (shotSwipeVisualizer != null)
-            shotSwipeVisualizer.Clear();
+        HideSwipeVisualImmediate();
 
         if (shotSwipeInputReader != null &&
             shotSwipeInputReader.TryForceCompleteCurrentSwipe(out RawSwipeData forcedSwipe))
@@ -384,11 +376,19 @@ public class ShotSequenceController : MonoBehaviour
         }
 
         PrepareTimeoutFallbackDecision();
-        //StartCommitWithPreparedDecision();
         StartCommitWithPreparedDecision(false);
     }
+
     private void HandleSwipeUpdated(System.Collections.Generic.List<Vector2> points)
     {
+        if (!_allowSwipeVisual || _commitStarted || CurrentState != ShotFlowState.WaitingForShotInput)
+        {
+            if (shotSwipeVisualizer != null)
+                shotSwipeVisualizer.Clear();
+
+            return;
+        }
+
         if (shotSwipeVisualizer != null)
             shotSwipeVisualizer.ShowSwipe(points);
     }
@@ -472,11 +472,13 @@ public class ShotSequenceController : MonoBehaviour
 
         _commitStarted = true;
 
-        // ✅ Asıl bug fix burası.
         // Swipe erken tamamlandıysa countdown coroutine'i beklenmez.
         // Time.timeScale hemen 1'e çekilir.
         if (restoreShotTimeImmediately && shotTimeController != null)
             shotTimeController.CancelCountdownAndRestoreForCommit();
+
+        HideSwipeVisualImmediate();
+
 
         if (shotSwipeInputReader != null)
             shotSwipeInputReader.StopListening();
@@ -556,6 +558,19 @@ public class ShotSequenceController : MonoBehaviour
         if (curveChangeController != null)
             curveChangeController.RestoreDefaults();
 
+    }
+
+    private void EnableSwipeVisual()
+    {
+        _allowSwipeVisual = true;
+    }
+
+    private void HideSwipeVisualImmediate()
+    {
+        _allowSwipeVisual = false;
+
+        if (shotSwipeVisualizer != null)
+            shotSwipeVisualizer.Clear();
     }
 
     private void SetState(ShotFlowState newState)

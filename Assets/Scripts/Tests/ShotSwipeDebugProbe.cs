@@ -50,8 +50,8 @@ public class ShotSwipeDebugProbe : MonoBehaviour
         ShotGoalTarget target = targetInterpreter != null && intent != null ? targetInterpreter.Interpret(intent, goal) : null;
         ShotDecisionResult decision = resolver != null && intent != null ? resolver.Resolve(intent, target, goal) : null;
 
-        if (visualizer != null && raw != null)
-            visualizer.ShowResolvedSwipe(raw, target);
+        /* if (visualizer != null && raw != null)
+             visualizer.ShowResolvedSwipe(raw, target);*/
 
         string log = BuildLog(raw, intent, target, decision);
 

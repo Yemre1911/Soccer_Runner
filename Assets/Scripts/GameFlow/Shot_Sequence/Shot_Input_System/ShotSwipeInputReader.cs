@@ -99,19 +99,6 @@ public class ShotSwipeInputReader : MonoBehaviour
             FinishSwipe(mousePos);
     }
 
-    /*private void StartSwipe(Vector2 screenPos)
-    {
-        _currentSwipe = new RawSwipeData
-        {
-            StartRealtime = Time.realtimeSinceStartup
-        };
-
-        _currentSwipe.Points.Add(screenPos);
-
-        IsSwiping = true;
-        OnSwipeStarted?.Invoke();
-        OnSwipeUpdated?.Invoke(_currentSwipe.Points);
-    }*/
     private void StartSwipe(Vector2 screenPos)
     {
         if (requireValidSwipeAreaStart &&
