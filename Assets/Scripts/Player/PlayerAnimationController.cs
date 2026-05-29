@@ -37,6 +37,7 @@ public class PlayerAnimationController : MonoBehaviour
     private static readonly int SpinMirrorBool = Animator.StringToHash("SpinMirror");
     private static readonly int ShootTrigger = Animator.StringToHash("Shoot");
     private static readonly int ShootMirrorBool = Animator.StringToHash("ShootMirror");
+    private static readonly int RainbowTrigger = Animator.StringToHash("Rainbow");
     private static readonly int Victory1Trigger = Animator.StringToHash("V1");
     private static readonly int Victory2Trigger = Animator.StringToHash("V2");
     private static readonly int Victory3Trigger = Animator.StringToHash("V3");
@@ -122,22 +123,6 @@ public class PlayerAnimationController : MonoBehaviour
         UpdateAnimationSpeed();
     }
 
-    /*private void UpdateAnimationSpeed()
-    {
-        float worldSpeed = GameManager.Instance != null ? GameManager.Instance.CurrentSpeed : 10f;
-
-        if (worldSpeed <= idleSpeedThreshold)
-        {
-            _animator.SetFloat(RunSpeedFloat, 0f);
-            return;
-        }
-
-        float sprintMultiplier = (playerSprint != null && playerSprint.IsSprinting) ? 1.5f : 1f;
-        float rawSpeed = (worldSpeed / speedDivisor) * sprintMultiplier * calibration;
-        float finalSpeed = Mathf.Clamp(rawSpeed, minAnimSpeed, maxAnimSpeed);
-
-        _animator.SetFloat(RunSpeedFloat, finalSpeed);
-    }*/
 
     private void UpdateAnimationSpeed()
     {
@@ -271,5 +256,16 @@ public class PlayerAnimationController : MonoBehaviour
     {
         if (_animator != null)
             _animator.applyRootMotion = true;
+    }
+
+    public void PlayRainbow()
+    {
+        if (_collapsed) return;
+
+        _animator.ResetTrigger(JumpTrigger);
+        _animator.ResetTrigger(FastDropTrigger);
+        _animator.ResetTrigger(SpinTrigger);
+
+        _animator.SetTrigger(RainbowTrigger);
     }
 }

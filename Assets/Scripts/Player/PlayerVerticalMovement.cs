@@ -22,6 +22,7 @@ public class PlayerVerticalMovement : MonoBehaviour, IJumper
     private float _jumpVelocity;
     private float _verticalVelocity;
     private bool _isGrounded;
+    public bool IsGrounded => _isGrounded;
     private bool _isQuickDropping;
 
     private const float GroundLevel = 0f;
