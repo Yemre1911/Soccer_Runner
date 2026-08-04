@@ -109,6 +109,9 @@ public class PlayerLateralMovement : MonoBehaviour, IMover
     [SerializeField] private float turnAngle = 90f;
 
     public float TargetX { get; private set; }
+    public float StepSize => Mathf.Max(0.01f, stepSize);
+    public float RoadWidth => Mathf.Max(0f, roadWidth);
+    public float LaneOriginX { get; private set; }
 
     private float _currentVelocity;
     private bool _movementLocked;
@@ -116,9 +119,10 @@ public class PlayerLateralMovement : MonoBehaviour, IMover
 
     public event Action<int> OnLaneChangeRequested;
 
-    private void Start()
+    private void Awake()
     {
-        TargetX = transform.position.x;
+        LaneOriginX = transform.position.x;
+        TargetX = LaneOriginX;
     }
 
     public void MoveStep(int direction)

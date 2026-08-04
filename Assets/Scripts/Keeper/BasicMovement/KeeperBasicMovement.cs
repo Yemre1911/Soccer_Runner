@@ -101,6 +101,20 @@ public class KeeperBasicMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Kaleci runtime sırasında başka bir final bloğuna taşındığında yeni local
+    /// pozisyonunu ana/başlangıç pozisyonu olarak kaydeder. Böylece Update içinde
+    /// eski training parent'ının Y/Z değerlerine geri sıçramaz.
+    /// </summary>
+    public void RebaseHomePosition()
+    {
+        _startLocalPosition = transform.localPosition;
+        _lastLocalX = transform.localPosition.x;
+        _isLocked = false;
+
+        PlayIdle();
+    }
+
     private float GetPlayerX()
     {
         return playerXReadMode == PlayerXReadMode.WorldX
