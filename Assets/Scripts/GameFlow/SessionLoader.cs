@@ -53,48 +53,7 @@ public class SessionLoader : MonoBehaviour
         StartSession(config);
     }
 
-    /*public void StartSession(SessionConfig config)
-    {
 
-        if (_started) return;
-        _started = true;
-
-        ActiveConfig = config;  //*
-
-
-        // 0) Tuning resolve
-        SessionTuning tuning = ResolveTuning(config);
-
-        // burada override
-        if (tuning != null && tuning.overrideLevelLength)
-        {
-            config.levelLengthMeters = Mathf.Max(1f, tuning.levelLengthMeters);
-            Debug.Log($"[SessionLoader] LevelLength overridden by tuning -> {config.levelLengthMeters}");
-        }
-
-        // UI: Difficulty yazdır (ŞUANDA SADECE TEST-SİLİNECEK) -----------------------------------------
-        var hud = FindFirstObjectByType<GameHUDController>();
-        if (hud) hud.SetDifficulty(config.difficulty);
-        // ----------------------------------------------------------------------------------------------
-
-        // 1) Environment
-        BuildEnvironment(config);
-
-        // 2) Pool Warmup
-        WarmupPools(config);
-
-        // 3) UI Init
-        InitUI(config);
-
-        // 4) Apply tuning to systems
-        ApplyTuningToSystems(tuning);
-
-        // 5) Begin director
-        StartDirector(config, tuning);
-
-        Debug.Log($"[SessionLoader] Starting Session | Level={config.levelNumber}, Length={config.levelLengthMeters}m, " +
-                  $"Diff={config.difficulty}, Env={config.environmentId}");
-    }*/
 
     public void StartSession(SessionConfig config)
     {

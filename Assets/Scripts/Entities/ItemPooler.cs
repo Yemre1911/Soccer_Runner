@@ -21,7 +21,6 @@ public class ItemPooler : MonoBehaviour
     private readonly Dictionary<string, Queue<GameObject>> _pool = new();
     private readonly Dictionary<string, GameObject> _prefabs = new();
 
-    // ✅ NEW: aktif objeleri takip (id -> active list)
     private readonly Dictionary<string, List<GameObject>> _activeById = new();
 
     private void Awake()
